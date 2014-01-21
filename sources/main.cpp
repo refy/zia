@@ -10,6 +10,11 @@ int	main(int ac, char **av)
   std::string		conf;
   apimeal::Error	err;
 
+  if (ac < 2)
+    {
+      std::cout << "Usage: ./zia configuration_file [OPTS]" << std::endl;
+      std::cout << "  -d/--debug : debug mode, print all the log message" << std::endl;
+    }
   for (int i = 1;i < ac;i++)
     {
       std::string	tmp(av[i]);
