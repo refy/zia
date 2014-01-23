@@ -21,6 +21,12 @@ ModuleLoader::~ModuleLoader()
     this->UnloadModule((it->first));
 }
 
+void	ModuleLoader::LoadModules(const std::vector<std::string> & m, apimeal::Error & error, apimeal::ILogger *log)
+{
+  for (std::vector<std::string>::const_iterator it = m.begin();it != m.end();++it)
+    this->LoadModule((*it), error, log);
+}
+
 void	ModuleLoader::LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log)
 {
   apimeal::AModule* (*mod)(apimeal::ILogger *);

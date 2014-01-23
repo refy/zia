@@ -3,7 +3,7 @@
 #include	"ConfParser.hpp"
 #include	"Error.hpp"
 #include	"Logger.hpp"
-#include	"ModuleLoader.hpp"
+#include	"Server.hpp"
 
 bool	check_error(apimeal::Error & e, apimeal::ILogger *log)
 {
@@ -47,17 +47,13 @@ int	main(int ac, char **av)
 
   check_error(err, log);
 
-  ModuleLoader	modules(parser->getModulesPath(), err, log);
+  Server	server(log, parser, err);
 
   check_error(err, log);
+  delete parser;
 
-  apimeal::AModule	*con = modules.getModule("Connection", err);
+  server.run();
 
-  if (!*check_error(err, log))
-    {
-      con->preConnexion(NULL, err);
-      check_error(err, log);
-    }
   delete log;
   return (0);
 }

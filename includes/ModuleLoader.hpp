@@ -26,6 +26,7 @@ public:
   ~ModuleLoader();
 
 public:
+  void	LoadModules(const std::vector<std::string> & m, apimeal::Error & e, apimeal::ILogger *log);
   void	LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log);
   void	UnloadModule(const std::string & module);
 
