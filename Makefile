@@ -17,15 +17,18 @@ CPPFLAGS=	-I./includes/ -Wall -Wextra
 
 LIBS=		-ldl
 
-all:		$(NAME)
+all:		$(MODULES) $(NAME)
 
 $(NAME):	$(OBJ)
 		$(CC) -o $(NAME) $(OBJ) $(LIBS)
+		$(MAKE) -C ./modules/Connection
 
 clean:
 		$(RM) $(OBJ)
+		$(MAKE) -C ./modules/Connection clean
 
 fclean:		clean
 		$(RM) $(NAME)
+		$(MAKE) -C ./modules/Connection fclean
 
 re:		fclean all

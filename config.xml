@@ -9,7 +9,8 @@
 
   <Modules> <!-- Modules section, content the place for all modules -->
     <root>modules/</root> <!-- The recurrent path of all module, optionnal -->
-    <path>Connection/Connection</path> <!-- The directory path for one module -->
+    <path>Connection/libPreConnection</path> <!-- The directory path for one module -->
+    <path>Connection/libPostConnection</path>
     <path>GenerateResponse/GenRes</path>
     <path>GetContent/GetContent</path>
     <path>ParseRequest/Parse</path>
