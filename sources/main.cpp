@@ -36,7 +36,7 @@ int	main(int ac, char **av)
   if (err.IsError)
     log->LogError(err.Message);
 
-  ModuleLoader	modules(parser->getModulesPath(), err);
+  ModuleLoader	modules(parser->getModulesPath(), err, log);
 
   if (err.IsError)
     log->LogError(err.Message);

@@ -15,12 +15,12 @@ Logger::Logger(const std::string & msgFormat, bool debug, const std::string & lo
   this->_stream.open(this->_logFile.c_str(), std::ofstream::out | std::fstream::app);
   if (!this->_stream.is_open())
     this->_debug = true;
-  this->LogInfo("--- Starting Zia ---");
+  this->LogInfo("--- Start ---");
 }
 
 Logger::~Logger()
 {
-  this->LogInfo("--- Ending Zia ---");
+  this->LogInfo("--- End ---");
   this->_stream.close();
 }
 
@@ -38,8 +38,9 @@ const std::string	Logger::getMsgFormated(const std::string & msg, const std::str
 
   timestamp = time(NULL);
   t = gmtime(&timestamp);
-  c << (1900 + t->tm_year) << "-" << std::setw(2) << std::setfill('0') << (t->tm_mon + 1) << "-" << t->tm_mday \
-    << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
+  c << (1900 + t->tm_year) << "-" << std::setw(2) << std::setfill('0') <<(t->tm_mon + 1);
+  c << "-" << std::setw(2) << std::setfill('0') << t->tm_mday << " " << std::setw(2) << std::setfill('0') << t->tm_hour;
+  c << ":" << std::setw(2) << std::setfill('0') << t->tm_min << ":" << std::setw(2) << std::setfill('0') << t->tm_sec;
   date = c.str();
 #endif
 
