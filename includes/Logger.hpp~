@@ -9,7 +9,7 @@
 // Different message type :
 //  %(type) : print the message type (ERROR, DEBUG, INFO)
 //  %(message) : print the message.
-//  %(time) : print the timestamp (only Linux now)
+//  %(time) : print the timestamp (not included)
 
 class	Logger : public apimeal::ILogger
 {

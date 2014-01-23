@@ -5,6 +5,7 @@ DIR_SRC=	./sources/
 SRC=		$(DIR_SRC)main.cpp \
 		$(DIR_SRC)ConfParser.cpp \
 		$(DIR_SRC)Logger.cpp \
+		$(DIR_SRC)ModuleLoader.cpp \
 
 OBJ=		$(SRC:.cpp=.o)
 

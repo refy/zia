@@ -23,9 +23,9 @@
     <!-- Format of the message which will be printed and write. different type:
 	 %(type) : type of the error (ERROR, DEBUG or INFO)
 	 %(message) : the message of the error.
-	 %(time) : the timestamp (not included) -->
+	 %(time) : the timestamp formated %Y-%m-%d %H:%M:%S -->
 
-    <format>%(type) : %(message)</format>
+    <format>%(time) : %(type) : %(message)</format>
   </Logger_info>
 
 </Zia>

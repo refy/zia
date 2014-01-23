@@ -43,7 +43,9 @@ public:
 	* \brief Get map of module's priority
 	* \return Map of priority of module 
 	*/
+
 	virtual std::map<eTypeModule, ePriority> getPriority() const = 0;
+
 	/**
 	* \brief Get version of the module
 	* \return Version of the module

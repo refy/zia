@@ -3,6 +3,7 @@
 #include	"ConfParser.hpp"
 #include	"Error.hpp"
 #include	"Logger.hpp"
+#include	"ModuleLoader.hpp"
 
 int	main(int ac, char **av)
 {
@@ -13,7 +14,7 @@ int	main(int ac, char **av)
   if (ac < 2)
     {
       std::cout << "Usage: ./zia configuration_file [OPTS]" << std::endl;
-      std::cout << "  -d/--debug : debug mode, print all the log message" << std::endl;
+      std::cout << "	-d/--debug : debug mode, print all the log message" << std::endl;
     }
   for (int i = 1;i < ac;i++)
     {
@@ -32,6 +33,14 @@ int	main(int ac, char **av)
   Logger	*log = new Logger(parser->getLoggerFormat(), debug,
 				  parser->getLoggerFile());
 
-  if (err.IsError && debug)
+  if (err.IsError)
     log->LogError(err.Message);
+
+  ModuleLoader	modules(parser->getModulesPath(), err);
+
+  if (err.IsError)
+    log->LogError(err.Message);
+
+  delete log;
+  return (0);
 }

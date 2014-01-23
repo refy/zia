@@ -1,0 +1,1 @@
+	* Change Makefile into CMake, for retrocompatibility.
