@@ -24,27 +24,28 @@ ModuleLoader::~ModuleLoader()
 void	ModuleLoader::LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log)
 {
   apimeal::AModule* (*mod)(apimeal::ILogger *);
+  apimeal::AModule* m;
+  std::string	modName;
 
 #if defined	(_WIN32)
-  HMODULE	library = LoadLibrary(module.c_str());
+  HMODULE	handle = LoadLibrary(module.c_str());
 
-  if (library == NULL)
+  if (handle == NULL)
     {
       error.IsError = true;
       error.Message += "Cannot open library: " + module + "\n";
       return ;
     }
 
-  mod = (apimeal::AModule* (*)(apimeal::ILogger *))GetProcAddress(library, "LoadModule");
+  mod = (apimeal::AModule* (*)(apimeal::ILogger *))GetProcAddress(handle, "LoadModule");
 
   if (mod == NULL)
     {
       error.IsError = true;
       error.Message += "Cannot load symbole 'LoadModule' for the module named " + module + "\n";
-      FreeLibrary(library);
+      FreeLibrary(handle);
       return ;
     }
-  this->_handles[module] = library;
 #else
   void	*handle = dlopen(module.c_str(), RTLD_LAZY);
 
@@ -66,7 +67,13 @@ void	ModuleLoader::LoadModule(const std::string & module, apimeal::Error & error
     }
   this->_handles[module] = handle;
 #endif
-  this->_mod[module] = mod(log);
+  m = mod(log);
+  modName = m->getName();
+  if (!modName.empty())
+    {
+      this->_mod[modName] = m;
+      this->_handles[modName] = handle;
+    }
 }
 
 void	ModuleLoader::UnloadModule(const std::string & module)
@@ -82,7 +89,7 @@ void	ModuleLoader::UnloadModule(const std::string & module)
 #endif
 }
 
-const apimeal::AModule*	ModuleLoader::getModule(const std::string & m, apimeal::Error & e)
+apimeal::AModule*	ModuleLoader::getModule(const std::string & m, apimeal::Error & e)
 {
   if (this->_mod.find(m) != this->_mod.end())
     return this->_mod[m];

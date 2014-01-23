@@ -5,6 +5,18 @@
 #include	"Logger.hpp"
 #include	"ModuleLoader.hpp"
 
+bool	check_error(apimeal::Error & e, apimeal::ILogger *log)
+{
+  if (e.IsError)
+    {
+      log->LogError(e.Message);
+      e.Message.clear();
+      e.IsError = false;
+      return true;
+    }
+  return false;
+}
+
 int	main(int ac, char **av)
 {
   bool			debug = false;
@@ -33,14 +45,19 @@ int	main(int ac, char **av)
   Logger	*log = new Logger(parser->getLoggerFormat(), debug,
 				  parser->getLoggerFile());
 
-  if (err.IsError)
-    log->LogError(err.Message);
+  check_error(err, log);
 
   ModuleLoader	modules(parser->getModulesPath(), err, log);
 
-  if (err.IsError)
-    log->LogError(err.Message);
+  check_error(err, log);
 
+  apimeal::AModule	*con = modules.getModule("Connection", err);
+
+  if (!*check_error(err, log))
+    {
+      con->preConnexion(NULL, err);
+      check_error(err, log);
+    }
   delete log;
   return (0);
 }

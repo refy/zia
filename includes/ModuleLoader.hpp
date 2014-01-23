@@ -30,7 +30,7 @@ public:
   void	UnloadModule(const std::string & module);
 
 public:
-  const apimeal::AModule*	getModule(const std::string & m, apimeal::Error & e);
+  apimeal::AModule*	getModule(const std::string & m, apimeal::Error & e);
 };
 
 #endif

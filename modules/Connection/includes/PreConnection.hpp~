@@ -11,7 +11,7 @@ public:
   ~PreConnection();
 
 public:
-  void	preConnexion(apimeal::IConnexion *c, apimeal::Error & e);
+  void	preConnection(apimeal::IConnexion *c, apimeal::Error & e);
 };
 
 #endif
