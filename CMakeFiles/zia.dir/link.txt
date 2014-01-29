@@ -1,1 +1,0 @@
-/usr/bin/c++   -O3 -DNDEBUG    CMakeFiles/zia.dir/sources/main.cpp.o CMakeFiles/zia.dir/sources/ModuleLoader.cpp.o CMakeFiles/zia.dir/sources/Server.cpp.o CMakeFiles/zia.dir/sources/ConfParser.cpp.o CMakeFiles/zia.dir/sources/Logger.cpp.o  -o zia -rdynamic -ldl 

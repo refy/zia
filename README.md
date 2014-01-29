@@ -1,4 +1,0 @@
-HTTPTDR
-===
-
-EPITECH Zia
