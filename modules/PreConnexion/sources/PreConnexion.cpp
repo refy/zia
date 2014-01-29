@@ -13,7 +13,9 @@ PreConnexion::~PreConnexion()
 {}
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	PreConnexion::getPriority() const
-{}
+{
+    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+}
 
 const apimeal::Version &		PreConnexion::getVersion() const
 {

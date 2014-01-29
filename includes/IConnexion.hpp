@@ -5,10 +5,8 @@
 
 #ifdef WIN32 
 #include <winsock2.h> 
-#elif defined (linux) 
-typedef int SOCKET;
 #else
-#error not defined for this platform
+typedef int SOCKET;
 #endif
 
 

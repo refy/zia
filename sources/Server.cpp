@@ -50,9 +50,9 @@ apimeal::IConnexion*	Server::accept_client()
   return (ptr);  
 }
 
-void	Server::run()
+void	Server::listenServer()
 {
-  apimeal::AModule	*bl = this->_loader.getModule("PreConnexion-Blacklist", this->_err);
+//  apimeal::AModule	*bl = this->_loader.getModule("Blacklist", this->_err);
 
   if (!this->checkError())
     {
@@ -97,7 +97,7 @@ void	Server::run()
 	      this->_log->LogDebug(port);
 	      this->_log->LogDebug(host);
 
-	      bl->preConnexion(ptr, this->_err);
+//	      bl->preConnexion(ptr, this->_err);
 	      this->checkError();
 	      delete ptr;
 	    }

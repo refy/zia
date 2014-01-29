@@ -9,7 +9,9 @@ PostGenerateResponse::~PostGenerateResponse()
 {}
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	PostGenerateResponse::getPriority() const
-{}
+{
+    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+}
 
 const apimeal::Version &		PostGenerateResponse::getVersion() const
 {

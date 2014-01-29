@@ -15,7 +15,9 @@ void	ContentModule::contentModule(apimeal::IHttpRequest *r, apimeal::Error & e)
 }
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	ContentModule::getPriority() const
-{}
+{
+    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+}
 
 const apimeal::Version &		ContentModule::getVersion() const
 {

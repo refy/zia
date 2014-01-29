@@ -9,7 +9,9 @@ PreParseRequest::~PreParseRequest()
 {}
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	PreParseRequest::getPriority() const
-{}
+{
+    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+}
 
 const apimeal::Version &		PreParseRequest::getVersion() const
 {

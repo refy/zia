@@ -9,7 +9,9 @@ PostConnexion::~PostConnexion()
 {}
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	PostConnexion::getPriority() const
-{}
+{
+    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+}
 
 const apimeal::Version &		PostConnexion::getVersion() const
 {

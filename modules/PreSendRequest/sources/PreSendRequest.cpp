@@ -15,7 +15,9 @@ void	PreSendRequest::preSendRequest(apimeal::IHttpResponse *r, apimeal::Error & 
 }
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	PreSendRequest::getPriority() const
-{}
+{
+    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+}
 
 const apimeal::Version &		PreSendRequest::getVersion() const
 {

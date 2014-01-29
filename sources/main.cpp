@@ -52,7 +52,7 @@ int	main(int ac, char **av)
   check_error(err, log);
   delete parser;
 
-  server.run();
+  server.listenServer();
 
   delete log;
   return (0);
