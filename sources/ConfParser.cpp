@@ -10,6 +10,7 @@ ConfParser::ConfParser(const std::string & file)
   this->_search["/Zia/Api/min_authorized_version"] = "0.1";
   this->_search["/Zia/Logger_info/log_file"] = "apimeal-zia.log";
   this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
+  this->_search["/Zia/Server_info/port"] = "80";
 }
 
 ConfParser::~ConfParser()
@@ -170,7 +171,7 @@ const std::string &			ConfParser::getApiName()
 int					ConfParser::getPort()
 {
   int			ret;
-  std::string		m = this->_search["/Zia/Connexion/port"];
+  std::string		m = this->_search["/Zia/Server_info/port"];
   std::istringstream	buffer(m);
 
   buffer >> ret;

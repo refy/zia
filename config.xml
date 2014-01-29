@@ -31,4 +31,8 @@
     <format>%(time) : %(type) : %(message)</format>
   </Logger_info>
 
+  <Server_info>
+    <port>8454</port>
+  </Server_info>
+
 </Zia>

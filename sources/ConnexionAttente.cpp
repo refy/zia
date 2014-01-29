@@ -1,5 +1,7 @@
 #include	"ConnexionAttente.hpp"
 
+#include	<iostream> // DELETE
+
 
 ConnexionAttente::ConnexionAttente(int port, int nbs_attente)
 {
@@ -92,24 +94,3 @@ SOCKET ConnexionAttente::getSocket()
 {
 	return (this->_sock);
 }
-
-
-
-apimeal::IConnexion* ConnexionAttente::accept_client()
-{
-	sockaddr_in	sin_tmp;
-	SOCKET		s_tmp;
-	socklen_t	sin_size;
-
-	if (!isOK())
-        	return (0);
-	sin_size = sizeof(sin_tmp);
-	if ((s_tmp = accept(this->_sock, (sockaddr *)&sin_tmp, &sin_size)) < 0)
-		return (0);
-	apimeal::IConnexion *ptr = new ConnexionClient(sin_tmp, s_tmp);
-	if (ptr == 0)
-		return (0);
-
-	return (ptr);
-}
-

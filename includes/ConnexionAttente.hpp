@@ -68,8 +68,6 @@ class ConnexionAttente: public apimeal::IConnexion
          * \brief Accepte une connexion d'un client
 	 * \return Connexion*: une connexion avecc un client si OK, 0 sinon
 	 */
-	apimeal::IConnexion* accept_client();
-
 
     protected:
     	SOCKET		_sock;

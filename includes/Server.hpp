@@ -21,6 +21,7 @@ public:
 
 private:
   bool	checkError();
+  apimeal::IConnexion	*accept_client();
 
 public:
   void	run();
