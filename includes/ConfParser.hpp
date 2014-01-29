@@ -14,6 +14,8 @@ private:
   std::string				_file;
   std::map<std::string, std::string>	_search;
   std::vector<std::string>		_modules;
+  std::map<std::string, std::string>	_docs;
+  std::vector<std::string>		_hosts;
 
 public:
   ConfParser(const std::string & file = "");
@@ -25,6 +27,7 @@ private:
   const std::string	parseLine(const std::string & line, int s);
   void			fillContent();
   void			fillModules();
+  void			fillWebsite();
 
 public:
   void					initialize(apimeal::Error & error);
@@ -34,6 +37,8 @@ public:
   const std::vector<std::string> &	getModulesPath() const;
   const std::string &			getLoggerFile();
   const std::string &			getLoggerFormat();
+  const std::vector<std::string> &	getVirtualHost();
+  const std::string &			getDocumentRoot(const std::string & virtual_host);
 };
 
 #endif

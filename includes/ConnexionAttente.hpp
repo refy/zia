@@ -19,8 +19,6 @@ class ConnexionAttente: public apimeal::IConnexion
     	ConnexionAttente(int port=80, int nbs_attente=5);
 	~ConnexionAttente();
 	
-	bool isOK() const;
-	
 	
 	/**
 	 * \brief getHostname
