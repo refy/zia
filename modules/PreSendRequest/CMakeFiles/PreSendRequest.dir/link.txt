@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libPreSendRequest.so -o libPreSendRequest.so CMakeFiles/PreSendRequest.dir/sources/PreSendRequest.cpp.o 

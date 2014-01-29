@@ -8,4 +8,4 @@ add_definitions(-DDllApimeal)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../includes)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/includes)
 
-add_library(CgiModule SHARED sources/CgiModule.cpp)
+add_library(CgiModule SHARED ${CMAKE_CURRENT_SOURCE_DIR}/sources/CgiModule.cpp)
