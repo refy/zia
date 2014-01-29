@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<Zia> <!-- Name of the module -->
+
+  <Api>                              <!-- Api section, content all the informations of the API -->
+    <name>apimeal</name> <!-- Name of the API, optionnal -->
+    <min_authorized_version>0.1</min_authorized_version> <!-- The minimum authorized version of the module to work correctly -->
+  </Api>
+
+  <Modules> <!-- Modules section, content the place for all modules -->
+    <root>modules/</root> <!-- The recurrent path of all module, optionnal -->
+    <path>Connexion/libConnexion</path> <!-- The directory path for one module -->
+    <path>GenerateResponse/libGenRes</path>
+    <path>GetContent/libGetContent</path>
+    <path>ParseRequest/libParseRequest</path>
+    <path>SendResponse/libSendRes</path>
+    <ext>so</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
+  </Modules>
+
+  <Logger_info>
+    <log_file>zia.log</log_file> <!-- File that will contain the info, debug and error of the server. -->
+
+    <!-- Format of the message which will be printed and write. different type:
+	 %(type) : type of the error (ERROR, DEBUG or INFO)
+	 %(message) : the message of the error.
+	 %(time) : the timestamp formated %Y-%m-%d %H:%M:%S -->
+
+    <format>%(time) : %(type) : %(message)</format>
+  </Logger_info>
+
+</Zia>
