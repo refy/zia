@@ -8,7 +8,7 @@ add_definitions(-DDllApimeal)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/includes)
 
 set(SOURCES_DIR sources/)
-set(SOURCES ${SOURCES_DIR}main.cpp ${SOURCES_DIR}ModuleLoader.cpp ${SOURCES_DIR}Server.cpp ${SOURCES_DIR}ConfParser.cpp ${SOURCES_DIR}Logger.cpp)
+set(SOURCES ${SOURCES_DIR}main.cpp ${SOURCES_DIR}ModuleLoader.cpp ${SOURCES_DIR}Server.cpp ${SOURCES_DIR}ConfParser.cpp ${SOURCES_DIR}Logger.cpp ${SOURCES_DIR}ConnexionAttente.cpp ${SOURCES_DIR}ConnexionClient.cpp)
 
 add_executable(zia ${SOURCES})
 

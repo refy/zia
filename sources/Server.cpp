@@ -1,11 +1,18 @@
+#include	<vector>
+
 #include	"AModule.hpp"
 #include	"Server.hpp"
+#include	"ConnexionClient.hpp"
+#include	"ConnexionAttente.hpp"
 
 Server::Server(apimeal::ILogger *log, ConfParser *p, apimeal::Error & e)
   : _log(log)
 {
   if (p)
-    this->_loader.LoadModules(p->getModulesPath(), e, log);
+    {
+      this->_loader.LoadModules(p->getModulesPath(), e, log);
+      this->_coWait = new ConnexionAttente(p->getPort());
+    }
 }
 
 Server::~Server()
@@ -27,22 +34,27 @@ bool	Server::checkError()
 
 void	Server::run()
 {
-  apimeal::AModule	*connexion = this->_loader.getModule("Connexion", this->_err);
-  apimeal::AModule	*parse = this->_loader.getModule("ParseRequest", this->_err);
-  apimeal::AModule	*content = this->_loader.getModule("GetContent", this->_err);
-  apimeal::AModule	*genres = this->_loader.getModule("GenRes", this->_err);
-  apimeal::AModule	*send = this->_loader.getModule("SendRes", this->_err);
+  apimeal::AModule	*bl = this->_loader.getModule("PreConnexion-Blacklist", this->_err);
+  apimeal::AModule	*co_ssl = this->_loader.getModule("PostConnexion-SSL", this->_err);
 
   if (!this->checkError())
     {
-      connexion->preConnexion(NULL, this->_err);
-      connexion->postConnexion(NULL, this->_err);
-      parse->preParseRequest(NULL, this->_err);
-      parse->postParseRequest(NULL, this->_err);
-      content->contentModule(NULL, this->_err);
-      genres->CGIModule(NULL, this->_err);
-      genres->postGenerateResponse(NULL, this->_err);
-      send->preSendRequest(NULL, this->_err);
+      bl->preConnexion(NULL, this->_err);
+      // co_ssl->postConnexion(NULL, this->_err);
       this->checkError();
+    }
+
+  // if (this->_coWait->isOK() == false)
+  //   this->_log->LogError("Cannot create the waiting socket.");
+  else
+    {
+      std::string	ip = "IP: " + this->_coWait->getIp();
+      std::string	port = "Port: " + this->_coWait->getPort();
+      std::string	host = "Hostname: " + this->_coWait->getHostname();
+
+      this->_log->LogDebug("Serveur Information");
+      this->_log->LogDebug(ip);
+      this->_log->LogDebug(port);
+      this->_log->LogDebug(host);
     }
 }

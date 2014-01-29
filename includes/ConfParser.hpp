@@ -29,6 +29,7 @@ private:
 public:
   void					initialize(apimeal::Error & error);
   const std::string &			getApiName();
+  int					getPort();
   const std::string &			getApiVersionMin();
   const std::vector<std::string> &	getModulesPath() const;
   const std::string &			getLoggerFile();

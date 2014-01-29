@@ -1,4 +1,5 @@
 #include	<fstream>
+#include	<sstream>
 #include	<iostream>
 #include	"ConfParser.hpp"
 
@@ -164,6 +165,16 @@ void					ConfParser::fillModules()
 const std::string &			ConfParser::getApiName()
 {
   return (this->_search["/Zia/Api/name"]);
+}
+
+int					ConfParser::getPort()
+{
+  int			ret;
+  std::string		m = this->_search["/Zia/Connexion/port"];
+  std::istringstream	buffer(m);
+
+  buffer >> ret;
+  return (ret);
 }
 
 const std::string &			ConfParser::getApiVersionMin()
