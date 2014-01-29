@@ -9,11 +9,14 @@
 
   <Modules> <!-- Modules section, content the place for all modules -->
     <root>modules/</root> <!-- The recurrent path of all module, optionnal -->
-    <path>Connexion/libConnexion</path> <!-- The directory path for one module -->
-    <path>GenerateResponse/libGenRes</path>
-    <path>GetContent/libGetContent</path>
-    <path>ParseRequest/libParseRequest</path>
-    <path>SendResponse/libSendRes</path>
+    <path>CGIModule/libCgiModule</path> <!-- The directory path for one module -->
+    <path>ContentModule/libContentModule</path>
+    <path>PostConnexion/libPostConnexion</path>
+    <path>PreConnexion/libPreConnexion</path>
+    <path>PostGenerateResponse/libPostGenerateResponse</path>
+    <path>PostParseRequest/libPostParseRequest</path>
+    <path>PreParseRequest/libPreParseRequest</path>
+    <path>PreSendRequest/libPreSendRequest</path>
     <ext>so</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
   </Modules>
 
