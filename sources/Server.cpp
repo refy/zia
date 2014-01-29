@@ -53,20 +53,17 @@ apimeal::IConnexion*	Server::accept_client()
 void	Server::run()
 {
   apimeal::AModule	*bl = this->_loader.getModule("PreConnexion-Blacklist", this->_err);
-  apimeal::AModule	*co_ssl = this->_loader.getModule("PostConnexion-SSL", this->_err);
 
   if (!this->checkError())
     {
-      bl->preConnexion(NULL, this->_err);
-      // co_ssl->postConnexion(NULL, this->_err);
       this->checkError();
       if (this->_coWait->getSocket() < 0)
 	this->_log->LogError("Cannot create the waiting socket.");
       else
 	{
-	  int		p = this->_coWait->getPort();
-	  std::stringstream    buffer;;
-	  std::string	tmppo;
+	  int			p = this->_coWait->getPort();
+	  std::stringstream	buffer;;
+	  std::string		tmppo;
 
 	  buffer << p;
 	  buffer >> tmppo;
@@ -75,7 +72,7 @@ void	Server::run()
 	  std::string	port = "Port: " + tmppo;
 	  std::string	host = "Hostname: " + this->_coWait->getHostname();
 
-	  this->_log->LogDebug("Serveur Information");
+	  this->_log->LogDebug("Serveur Information: ");
 	  this->_log->LogDebug(ip);
 	  this->_log->LogDebug(port);
 	  this->_log->LogDebug(host);
@@ -84,9 +81,9 @@ void	Server::run()
 
 	  while ((ptr = this->accept_client()) != 0)
 	    {
-	      int		p = ptr->getPort();
-	      std::stringstream    buffer;;
-	      std::string	tmppo;
+	      int			p = ptr->getPort();
+	      std::stringstream		buffer;;
+	      std::string		tmppo;
 
 	      buffer << p;
 	      buffer >> tmppo;
@@ -95,7 +92,7 @@ void	Server::run()
 	      std::string	port = "Port: " + tmppo;
 	      std::string	host = "Hostname: " + ptr->getHostname();
 
-	      this->_log->LogDebug("Connexion Information");
+	      this->_log->LogDebug("Connexion Information: ");
 	      this->_log->LogDebug(ip);
 	      this->_log->LogDebug(port);
 	      this->_log->LogDebug(host);

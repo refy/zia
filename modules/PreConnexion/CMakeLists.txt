@@ -8,4 +8,8 @@ add_definitions(-DDllApimeal)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../includes)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/includes)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+  add_definitions(-std=gnu++0x)
+endif()
+
 add_library(PreConnexion SHARED sources/PreConnexion.cpp)

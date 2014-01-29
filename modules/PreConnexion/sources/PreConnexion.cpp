@@ -1,3 +1,5 @@
+#include	<mutex>
+#include	<thread>
 #include	"AModule.hpp"
 #include	"PreConnexion.hpp"
 
@@ -23,15 +25,6 @@ const std::string &			PreConnexion::getName() const
   return (this->_name);
 }
 
-
-/**
-** \fn void PreConnexion::preConnexion(apimeal::IConnexion *c, apimeal::Error & e)
-** \brief Verifie que la connexion client n'est pas dans la blacklist
-**
-** \param c Connexion du client a verifier
-** \param e Error a declencher si le client est blackliste
-** \return Ne retourne rien mais prepare l'erreur en cas de probleme
-*/
 void	PreConnexion::preConnexion(apimeal::IConnexion *c, apimeal::Error & e)
 {
 	if (time(0) > this->_t_last_blacklist)
@@ -64,12 +57,6 @@ void	PreConnexion::preConnexion(apimeal::IConnexion *c, apimeal::Error & e)
 }
 
 
-/**
-** \fn void PreConnexion::load_blacklist()
-** \brief Gere le rechargement de la blacklist
-**
-** \return Retourne rien
-*/
 void	PreConnexion::load_blacklist()
 {
 	std::ifstream	file(PRECONNEXION_BLACKLIST_FILE);
