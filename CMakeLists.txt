@@ -7,13 +7,16 @@ add_definitions(-DDllApimeal)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/includes)
 
-set(SOURCES_DIR sources/)
-set(SOURCES ${SOURCES_DIR}main.cpp ${SOURCES_DIR}ModuleLoader.cpp ${SOURCES_DIR}Server.cpp ${SOURCES_DIR}ConfParser.cpp ${SOURCES_DIR}Logger.cpp ${SOURCES_DIR}ConnexionAttente.cpp ${SOURCES_DIR}ConnexionClient.cpp)
+set(SDIR sources/)
+set(SOURCES ${SDIR}main.cpp ${SDIR}ModuleLoader.cpp ${SDIR}Server.cpp ${SDIR}ConfParser.cpp ${SDIR}Logger.cpp
+  ${SDIR}ConnexionAttente.cpp ${SDIR}ConnexionClient.cpp ${SDIR}Thread.cpp ${SDIR}HttpResponse.cpp
+  ${SDIR}HttpRequest.cpp ${SDIR}pipeline.cpp)
 
 add_executable(zia ${SOURCES})
 
 if (UNIX)
   target_link_libraries(zia dl)
+  target_link_libraries(zia pthread)
 endif()
 
 add_subdirectory(modules/CGIModule/)

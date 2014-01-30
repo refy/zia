@@ -2,7 +2,7 @@
 
 <Zia> <!-- Name of the module -->
 
-  <Api>                              <!-- Api section, content all the informations of the API -->
+  <Api> <!-- Api section, content all the informations of the API -->
     <name>apimeal</name> <!-- Name of the API, optionnal -->
     <min_authorized_version>0.1</min_authorized_version> <!-- The minimum authorized version of the module to work correctly -->
   </Api>
@@ -12,12 +12,6 @@
     <path>CGIModule/libCgiModule</path> <!-- The directory path for one module -->
     <path>Blacklist/libBlacklist</path>
     <path>SSLConnexion/libSSLConnexion</path>
-    <!-- <path>PostConnexion/libPostConnexion</path> -->
-    <!-- <path>PreConnexion/libPreConnexion</path> -->
-    <!-- <path>PostGenerateResponse/libPostGenerateResponse</path> -->
-    <!-- <path>PostParseRequest/libPostParseRequest</path> -->
-    <!-- <path>PreParseRequest/libPreParseRequest</path> -->
-    <!-- <path>PreSendRequest/libPreSendRequest</path> -->
     <ext>so</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
   </Modules>
 

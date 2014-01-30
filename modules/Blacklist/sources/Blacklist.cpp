@@ -2,6 +2,7 @@
 #include	<thread>
 #include	"AModule.hpp"
 #include	"Blacklist.hpp"
+#include	"eTypeModule.hpp"
 
 Blacklist::Blacklist(apimeal::ILogger *log)
   : AModule(log), _version(0, 1), _name("Blacklist")
@@ -12,9 +13,12 @@ Blacklist::Blacklist(apimeal::ILogger *log)
 Blacklist::~Blacklist()
 {}
 
-std::map<apimeal::eTypeModule, apimeal::ePriority>	PreConnexion::getPriority() const
+std::map<apimeal::eTypeModule, apimeal::ePriority>	Blacklist::getPriority() const
 {
-    return std::map<apimeal::eTypeModule, apimeal::ePriority>();
+  std::map<apimeal::eTypeModule, apimeal::ePriority>	ret;
+
+  ret[apimeal::PRECONNEXION] = 1.0f;
+  return (ret);
 }
 
 const apimeal::Version &		Blacklist::getVersion() const

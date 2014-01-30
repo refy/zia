@@ -1,25 +1,41 @@
+#include	<signal.h>
+#include	<errno.h>
 #include	<sstream>
 #include	<vector>
-
 #include	"AModule.hpp"
 #include	"Server.hpp"
 #include	"ConnexionClient.hpp"
 #include	"ConnexionAttente.hpp"
-#include    "Thread.h"
-#include    "pipeline.h"
-#include <errno.h>
-Server::Server(apimeal::ILogger *log, ConfParser *p, apimeal::Error & e)
+#include	"Thread.h"
+#include	"pipeline.h"
+
+Server::Server()
+{}
+
+Server::Server(apimeal::ILogger *log, ConfParser *p)
   : _log(log)
 {
   if (p)
     {
-      this->_loader.LoadModules(p->getModulesPath(), e, log);
+      this->_loader.LoadModules(p->getModulesPath(), this->_err, this->_log);
       this->_coWait = new ConnexionAttente(p->getPort());
     }
 }
 
 Server::~Server()
 {}
+
+void	Server::initServer(apimeal::ILogger *log, ConfParser *p)
+{
+  this->_log = log;
+    if (p)
+    {
+      this->_loader.LoadModules(p->getModulesPath(), this->_err, this->_log);
+      std::cout << "COUCOU" << std::endl;
+      this->_coWait = new ConnexionAttente(p->getPort());
+      std::cout << "COUCOU" << std::endl;
+      }
+}
 
 bool	Server::checkError()
 {
@@ -38,13 +54,13 @@ bool	Server::checkError()
 apimeal::IConnexion*	Server::accept_client()
 {
   sockaddr_in	sin_tmp;
-  SOCKET		s_tmp;
+  SOCKET	s_tmp;
   socklen_t	sin_size;
 
   if (!this->_coWait->getSocket() < 0)
     return (0);
   sin_size = sizeof(sin_tmp);
-    signal(SIGPIPE, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
   if ((s_tmp = accept(this->_coWait->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)
   {
       std::cout << "Errno " << errno << std::endl;
@@ -66,59 +82,41 @@ void *Server::pipelineEntry(void *param)
     return NULL;
 }
 
+void	Server::printConnexionInfo(apimeal::IConnexion *ptr, const std::string & msg)
+{
+  std::stringstream	s;
+  std::string		ip = "IP: ";
+  std::string		port = "Port: ";
+  std::string		host = "Hostname: ";
+  int			port_int = ptr->getPort();
+  std::string		port_str;
+
+  s << port_int;
+  s >> port_str;
+  ip += ptr->getIp();
+  port += port_str;
+  host += ptr->getHostname();
+  this->_log->LogDebug(msg);
+  this->_log->LogDebug(ip);
+  this->_log->LogDebug(port);
+  this->_log->LogDebug(host);
+}
+
 void	Server::listenServer()
 {
-//  apimeal::AModule	*bl = this->_loader.getModule("Blacklist", this->_err);
+  apimeal::IConnexion	*ptr;
 
-  if (!this->checkError())
+  if (this->_coWait->getSocket() < 0)
+    this->_log->LogError("Cannot create the waiting socket.");
+  else
     {
-      this->checkError();
-      if (this->_coWait->getSocket() < 0)
-	this->_log->LogError("Cannot create the waiting socket.");
-      else
+      this->printConnexionInfo(this->_coWait, "Server socket informations: ");
+      Thread		thread(this->pipelineEntry);
+      while ((ptr = this->accept_client()) != 0)
 	{
-	  int			p = this->_coWait->getPort();
-	  std::stringstream	buffer;;
-	  std::string		tmppo;
-
-	  buffer << p;
-	  buffer >> tmppo;
-
-	  std::string	ip = "IP: " + this->_coWait->getIp();
-	  std::string	port = "Port: " + tmppo;
-	  std::string	host = "Hostname: " + this->_coWait->getHostname();
-
-	  this->_log->LogDebug("Serveur Information: ");
-	  this->_log->LogDebug(ip);
-	  this->_log->LogDebug(port);
-	  this->_log->LogDebug(host);
-
-	  apimeal::IConnexion	*ptr;
-        
-        Thread thread(this->pipelineEntry);
-        
-	  while ((ptr = this->accept_client()) != 0)
-	    {
-	      int			p = ptr->getPort();
-	      std::stringstream		buffer;;
-	      std::string		tmppo;
-
-	      buffer << p;
-	      buffer >> tmppo;
-
-	      std::string	ip = "IP: " + ptr->getIp();
-	      std::string	port = "Port: " + tmppo;
-	      std::string	host = "Hostname: " + ptr->getHostname();
-
-	      this->_log->LogDebug("Connexion Information: ");
-	      this->_log->LogDebug(ip);
-	      this->_log->LogDebug(port);
-	      this->_log->LogDebug(host);
-
-//	      bl->preConnexion(ptr, this->_err);
-	      this->checkError();
-            thread.run(ptr);
-	    }
+	  this->printConnexionInfo(ptr, "Client socket informations: ");
+	  this->checkError();
+	  thread.run(ptr);
 	}
     }
 }
