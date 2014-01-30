@@ -62,6 +62,7 @@ void *Server::pipelineEntry(void *param)
     // postConnexion;
     pipeline pipe(client);
     pipe.run();
+    delete client;
     return NULL;
 }
 

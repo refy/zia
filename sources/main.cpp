@@ -39,8 +39,9 @@ int	main(int ac, char **av)
 	conf.assign(av[i]);
     }
 
-  ConfParser	*parser = new ConfParser(conf);
-
+    ConfParser	*parser = ConfParser::getInstance();
+    parser->setFile(conf);
+    
   parser->initialize(err);
 
   Logger	*log = new Logger(parser->getLoggerFormat(), debug,
@@ -51,7 +52,6 @@ int	main(int ac, char **av)
   Server	server(log, parser, err);
 
   check_error(err, log);
-  delete parser;
 
   server.listenServer();
 

@@ -12,6 +12,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "ConfParser.hpp"
 
 pipeline::pipeline(apimeal::IConnexion *client):
 _client(client), __continue(true)
@@ -28,7 +29,7 @@ void pipeline::parseRequest(){
     request = request.substr(request.find('\n') + 1);
     while (request.size())
     {
-        std::string param = request.substr(0, request.find('\n') - 1);
+        std::string param = request.substr(0, request.find('\n'));
         if (param.size() > 0)
             this->_request->addHeader(param.substr(0, param.find(':')), param.substr(param.find(':') + 1));
         request = request.substr(request.find('\n') + 1);
@@ -36,40 +37,90 @@ void pipeline::parseRequest(){
     //postParse
 }
 
+std::string pipeline::findDocRoot()
+{
+    std::string docRoot = "";
+    
+    docRoot = ConfParser::getInstance()->getDocumentRoot(this->_request->getHeaders().find("Host")->second);
+    if (docRoot.size() <= 0)
+        docRoot = ConfParser::getInstance()->getDocumentRoot("*");
+    if (docRoot.size() <= 0 && ConfParser::getInstance()->getVirtualHost().size() > 0)
+        docRoot = ConfParser::getInstance()->getDocumentRoot(ConfParser::getInstance()->getVirtualHost()[0]);
+    if (docRoot.size() <= 0)
+    {
+        this->_error->IsError = true;
+        this->_error->Message = "Bad request";
+        this->_error->Code = 400;
+    }
+    return docRoot;
+}
+
 std::string pipeline::fileGetContent(const std::string &fileName)
 {
     char buffer[256];
     long readed;
     std::string content;
-    std::string realFile = "/var/www/" + fileName;
-//    int fd = open(fileName.c_str(), O_RDONLY);
-    int fd = open(realFile.c_str(), O_RDONLY);
-    if (fd < 0)
+    std::string realFile = this->findDocRoot() + fileName;
+    
+    if (this->_error->IsError == false)
     {
-        this->_response->setStatusCode(404);
-        this->_response->setReasonPhrase("Not found");
+        int fd = open(realFile.c_str(), O_RDONLY);
+        if (fd < 0)
+        {
+            this->_response->setStatusCode(404);
+            this->_response->setReasonPhrase("Not Found");
+        }
+        else
+        {
+            do {
+                readed = read(fd, buffer, 255);
+                if (readed > 0)
+                {
+                    buffer[readed] = 0;
+                    content += buffer;
+                }
+            } while (readed >= 255);
+        }
+        close(fd);
     }
-    else
-    {
-        do {
-            readed = read(fd, buffer, 255);
-            if (readed > 0)
-            {
-                buffer[readed] = 0;
-                content += buffer;
-            }
-        } while (readed >= 255);
-    }
-    close(fd);
     return content;
+}
+
+void pipeline::getPostBody()
+{
+    int bodySize = atoi(this->_request->getHeaders().find("Content-Length")->second.c_str());
+    std::cout << "Host " << this->_request->getHeaders().find("Host")->second << std::endl;
+    std::cout << "BodySize " << bodySize << std::endl;
+    int pos = 0;
+    char buffer[1025];
+    long readed = 0;
+    std::string body;
+    
+    
+    do
+    {
+        if (bodySize - pos >= 1024)
+            readed = read(this->_client->getSocket(), buffer, 1024);
+        else
+            readed = read(this->_client->getSocket(), buffer, bodySize - pos);
+        buffer[readed] = 0;
+        body += buffer;
+        pos += readed;
+    } while (pos < bodySize && readed > 0);
+    
+    this->_request->setBody(body);
 }
 
 void pipeline::getContent()
 {
-    // test contentModule
-    this->_request->setBody(fileGetContent(this->_request->getRequestURI()));
-    
-    // postGetContent
+    if (this->_request->getMethod() == "POST")
+    {
+        if (this->_request->getHeaders().find("Content-Length") != this->_request->getHeaders().end())
+        {
+            this->getPostBody();
+        }
+    }
+    // contentModule
 }
 
 #include <time.h>
@@ -92,11 +143,16 @@ std::string pipeline::genDate()
 void pipeline::generateResponse()
 {
     //CGI
-    this->_response->setBody(this->_request->getBody());
+    if (this->_error->IsError == false &&
+        (this->_request->getMethod() == "GET" || this->_request->getMethod() == "POST" ||
+         this->_request->getMethod() == "HEAD"))
+        this->_response->setBody(this->fileGetContent(this->_request->getRequestURI()));
     this->_response->addHeader("Date", this->genDate());
     std::ostringstream oss;
     oss << this->_response->getBody().size();
     this->_response->addHeader("Content-Length", oss.str());
+    if (this->_request->getMethod() == "HEAD")
+        this->_response->setBody("");
     //post
 }
 
@@ -148,6 +204,14 @@ bool pipeline::_continue(){
     return this->__continue;
 }
 
+bool pipeline::requestIsComplete(const std::string &request)
+{
+//    std::cout << request << std::endl;
+    if (request.find("\r\n\r\n") != request.npos || request.find("\n\n") != request.npos)
+        return true;
+    return false;
+}
+
 void pipeline::readRequest()
 {
     std::string request;
@@ -162,7 +226,7 @@ void pipeline::readRequest()
             buffer[readed] = 0;
             request += buffer;
         }
-    } while (readed >= 255);
+    } while ((readed >= 255 || this->requestIsComplete(request) == false) && readed > 0);
     if (request.size() == 0)
         this->__continue = false;
     std::cout << request << std::endl;
@@ -178,6 +242,7 @@ void pipeline::postConnexion(){
 void pipeline::run(){
     while (this->_continue())
     {
+        this->_error = new apimeal::Error;
         this->_response = new HttpResponse;
         this->_request = new HttpRequest;
         this->postConnexion();
@@ -187,6 +252,7 @@ void pipeline::run(){
         this->sendResponse();
         delete this->_response;
         delete this->_request;
+        delete this->_error;
         this->_client->setRequest("");
     }
     std::cout << "Connexion closed" << std::endl;
