@@ -1,25 +1,39 @@
+#include	<signal.h>
+#include	<errno.h>
 #include	<sstream>
 #include	<vector>
-
 #include	"AModule.hpp"
 #include	"Server.hpp"
 #include	"ConnexionClient.hpp"
 #include	"ConnexionAttente.hpp"
-#include    "Thread.h"
-#include    "pipeline.h"
-#include <errno.h>
-Server::Server(apimeal::ILogger *log, ConfParser *p, apimeal::Error & e)
+#include	"Thread.h"
+#include	"pipeline.h"
+
+Server::Server()
+{}
+
+Server::Server(apimeal::ILogger *log, ConfParser *p)
   : _log(log)
 {
   if (p)
     {
-      this->_loader.LoadModules(p->getModulesPath(), e, log);
+      this->_loader.LoadModules(p->getModulesPath(), this->_err, this->_log);
       this->_coWait = new ConnexionAttente(p->getPort());
     }
 }
 
 Server::~Server()
 {}
+
+void	Server::initServer(apimeal::ILogger *log, ConfParser *p)
+{
+  this->_log = log;
+  if (p)
+    {
+      this->_loader.LoadModules(p->getModulesPath(), this->_err, this->_log);
+      this->_coWait = new ConnexionAttente(p->getPort());
+    }
+}
 
 bool	Server::checkError()
 {
@@ -38,13 +52,13 @@ bool	Server::checkError()
 apimeal::IConnexion*	Server::accept_client()
 {
   sockaddr_in	sin_tmp;
-  SOCKET		s_tmp;
+  SOCKET	s_tmp;
   socklen_t	sin_size;
 
   if (!this->_coWait->getSocket() < 0)
     return (0);
   sin_size = sizeof(sin_tmp);
-    signal(SIGPIPE, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
   if ((s_tmp = accept(this->_coWait->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)
   {
       std::cout << "Errno " << errno << std::endl;
@@ -67,8 +81,6 @@ void *Server::pipelineEntry(void *param)
 
 void	Server::listenServer()
 {
-//  apimeal::AModule	*bl = this->_loader.getModule("Blacklist", this->_err);
-
   if (!this->checkError())
     {
       this->checkError();

@@ -10,28 +10,25 @@
 class	Server
 {
 private:
-    
   apimeal::ILogger*	_log;
   apimeal::Error	_err;
   ModuleLoader		_loader;
-    apimeal::IConnexion *_coWait;
+  apimeal::IConnexion*	_coWait;
     
 public:
-  Server(apimeal::ILogger *log, ConfParser *p, apimeal::Error & e);
+  Server();
+  Server(apimeal::ILogger *log, ConfParser *p);
   ~Server();
 
 private:
-    
-  bool	checkError();
-  apimeal::IConnexion	*accept_client();
-
-    static void *pipelineEntry(void *);
+  bool			checkError();
+  apimeal::IConnexion*	accept_client();
+  static void*		pipelineEntry(void *);
     
 public:
-    
-    void initServer(){}
-    void listenServer();
-    void closeServer(){}
+  void initServer(apimeal::ILogger *log, ConfParser *p);
+  void listenServer();
+  void closeServer() {}
 
 };
 

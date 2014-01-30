@@ -18,7 +18,7 @@ private:
   std::vector<std::string>		_hosts;
 
 public:
-  ConfParser(const std::string & file = "");
+  ConfParser(apimeal::Error & e, const std::string & file = "");
   ~ConfParser();
 
 private:
@@ -30,7 +30,6 @@ private:
   void			fillWebsite();
 
 public:
-  void					initialize(apimeal::Error & error);
   const std::string &			getApiName();
   int					getPort();
   const std::string &			getApiVersionMin();

@@ -3,7 +3,7 @@
 #include	<iostream>
 #include	"ConfParser.hpp"
 
-ConfParser::ConfParser(const std::string & file)
+ConfParser::ConfParser(apimeal::Error & e, const std::string & file)
   : _file(file)
 {
   this->_search["/Zia/Api/name"] = "apimeal";
@@ -12,15 +12,11 @@ ConfParser::ConfParser(const std::string & file)
   this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
   this->_search["/Zia/Server_info/port"] = "80";
   this->_docs["NO VIRTUAL HOST"] = "";
+  this->getContent(e);
 }
 
 ConfParser::~ConfParser()
 {}
-
-void					ConfParser::initialize(apimeal::Error & error)
-{
-  this->getContent(error);
-}
 
 bool					ConfParser::cleanLine(std::string & line, bool comment)
 {

@@ -17,44 +17,43 @@ bool	check_error(apimeal::Error & e, apimeal::ILogger *log)
   return false;
 }
 
+int	run_server(bool debug, const std::string & conf)
+{
+  Server		server;
+  apimeal::Error	err;
+  ConfParser*		parser = new ConfParser(err, conf);
+  Logger*		log = new Logger(parser->getLoggerFormat(), debug,
+					 parser->getLoggerFile());
+
+  check_error(err, log);
+  delete parser;
+  server.initServer(log, parser);
+  server.listenServer();
+  server.closeServer();
+  delete log;
+}
+
 int	main(int ac, char **av)
 {
-    
   bool			debug = false;
   std::string		conf = "config.xml";
-  apimeal::Error	err;
 
-  if (ac < 2)
-    {
-      std::cout << "Usage: ./zia configuration_file [OPTS]" << std::endl;
-      std::cout << "	-d/--debug : debug mode, print all the log message" << std::endl;
-    }
   for (int i = 1;i < ac;i++)
     {
       std::string	tmp(av[i]);
 
       if (tmp == "-d" || tmp == "--debug")
 	debug = true;
+      else if (tmp == "-h" || tmp == "--help")
+	{
+	  std::cout << "Usage: ./zia [configuration_file] [OPTS]" << std::endl;
+	  std::cout << "	-d/--debug : debug mode, print all the log message" << std::endl;
+	  return (0);
+	}
       else
 	conf.assign(av[i]);
     }
 
-  ConfParser	*parser = new ConfParser(conf);
-
-  parser->initialize(err);
-
-  Logger	*log = new Logger(parser->getLoggerFormat(), debug,
-				  parser->getLoggerFile());
-
-  check_error(err, log);
-
-  Server	server(log, parser, err);
-
-  check_error(err, log);
-  delete parser;
-
-  server.listenServer();
-
-  delete log;
+  run_server(debug, conf);
   return (0);
 }
