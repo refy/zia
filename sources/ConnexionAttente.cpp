@@ -1,8 +1,5 @@
 #include	"ConnexionAttente.hpp"
 
-#include	<iostream> // DELETE
-
-
 ConnexionAttente::ConnexionAttente(int port, int nbs_attente)
 {
 	this->_sin.sin_addr.s_addr  = htonl(INADDR_ANY);
@@ -51,14 +48,6 @@ ConnexionAttente::~ConnexionAttente()
 		close(this->_sock);
 	this->_sock = -1;
 }
-	
-bool	ConnexionAttente::isOK() const
-{
-	if (this->_sock < 0)
-		return (false);
-	return (true);
-}
-
 
 std::string const &ConnexionAttente::getHostname() const
 {

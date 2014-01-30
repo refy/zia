@@ -18,8 +18,6 @@ class ConnexionClient: public apimeal::IConnexion
 	ConnexionClient(const sockaddr_in &sin, SOCKET s);
 	~ConnexionClient();
 	
-	bool isOK() const;
-
 	/**
 	 * \brief getHostname
 	 * \return std::string const & : Hostname client

@@ -26,13 +26,6 @@ ConnexionClient::~ConnexionClient()
 	this->_sock = -1;
 }
 
-bool ConnexionClient::isOK() const
-{
-	if (this->_sock < 0)
-		return (false);
-	return (true);
-}
-
 std::string const &ConnexionClient::getHostname() const
 {
 	return (this->_hostname);

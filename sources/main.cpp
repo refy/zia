@@ -19,6 +19,7 @@ bool	check_error(apimeal::Error & e, apimeal::ILogger *log)
 
 int	main(int ac, char **av)
 {
+    
   bool			debug = false;
   std::string		conf = "config.xml";
   apimeal::Error	err;

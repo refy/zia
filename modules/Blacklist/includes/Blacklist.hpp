@@ -16,15 +16,15 @@
 #define		PRECONNEXION_BLACKLIST_FILE	"blacklist.txt"
 #define		PRECONNEXION_T_RELOAD_BLACKLIST	60
 
-class	PreConnexion : public apimeal::AModule
+class	Blacklist : public apimeal::AModule
 {
 private:
   apimeal::Version	_version;
   std::string		_name;
 
 public:
-  PreConnexion(apimeal::ILogger *log);
-  ~PreConnexion();
+  Blacklist(apimeal::ILogger *log);
+  ~Blacklist();
 
 public:
   std::map<apimeal::eTypeModule, apimeal::ePriority>	getPriority() const;

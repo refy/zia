@@ -1,15 +1,15 @@
 #include	<mutex>
 #include	<thread>
 #include	"AModule.hpp"
-#include	"PreConnexion.hpp"
+#include	"Blacklist.hpp"
 
-PreConnexion::PreConnexion(apimeal::ILogger *log)
-  : AModule(log), _version(0, 1), _name("PreConnexion-Blacklist")
+Blacklist::Blacklist(apimeal::ILogger *log)
+  : AModule(log), _version(0, 1), _name("Blacklist")
 {
 	load_blacklist();
 }
 
-PreConnexion::~PreConnexion()
+Blacklist::~Blacklist()
 {}
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	PreConnexion::getPriority() const
@@ -17,17 +17,17 @@ std::map<apimeal::eTypeModule, apimeal::ePriority>	PreConnexion::getPriority() c
     return std::map<apimeal::eTypeModule, apimeal::ePriority>();
 }
 
-const apimeal::Version &		PreConnexion::getVersion() const
+const apimeal::Version &		Blacklist::getVersion() const
 {
   return (this->_version);
 }
 
-const std::string &			PreConnexion::getName() const
+const std::string &			Blacklist::getName() const
 {
   return (this->_name);
 }
 
-void	PreConnexion::preConnexion(apimeal::IConnexion *c, apimeal::Error & e)
+void	Blacklist::preConnexion(apimeal::IConnexion *c, apimeal::Error & e)
 {
 	if (time(0) > this->_t_last_blacklist)
 		load_blacklist();
@@ -59,7 +59,7 @@ void	PreConnexion::preConnexion(apimeal::IConnexion *c, apimeal::Error & e)
 }
 
 
-void	PreConnexion::load_blacklist()
+void	Blacklist::load_blacklist()
 {
 	std::ifstream	file(PRECONNEXION_BLACKLIST_FILE);
 
@@ -82,5 +82,5 @@ void	PreConnexion::load_blacklist()
 
 extern "C" DLLAPIMEAL	apimeal::AModule*	LoadModule(apimeal::ILogger *log)
 {
-  return (new PreConnexion(log));
+  return (new Blacklist(log));
 }

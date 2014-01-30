@@ -5,7 +5,9 @@
 #include	"Server.hpp"
 #include	"ConnexionClient.hpp"
 #include	"ConnexionAttente.hpp"
-
+#include    "Thread.h"
+#include    "pipeline.h"
+#include <errno.h>
 Server::Server(apimeal::ILogger *log, ConfParser *p, apimeal::Error & e)
   : _log(log)
 {
@@ -42,12 +44,25 @@ apimeal::IConnexion*	Server::accept_client()
   if (!this->_coWait->getSocket() < 0)
     return (0);
   sin_size = sizeof(sin_tmp);
+    signal(SIGPIPE, SIG_IGN);
   if ((s_tmp = accept(this->_coWait->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)
+  {
+      std::cout << "Errno " << errno << std::endl;
     return (0);
+  }
   apimeal::IConnexion *ptr = new ConnexionClient(sin_tmp, s_tmp);
   if (ptr == 0)
     return (0);
   return (ptr);  
+}
+
+void *Server::pipelineEntry(void *param)
+{
+    apimeal::IConnexion *client = (apimeal::IConnexion *)param;
+    // postConnexion;
+    pipeline pipe(client);
+    pipe.run();
+    return NULL;
 }
 
 void	Server::listenServer()
@@ -78,7 +93,9 @@ void	Server::listenServer()
 	  this->_log->LogDebug(host);
 
 	  apimeal::IConnexion	*ptr;
-
+        
+        Thread thread(this->pipelineEntry);
+        
 	  while ((ptr = this->accept_client()) != 0)
 	    {
 	      int			p = ptr->getPort();
@@ -99,7 +116,7 @@ void	Server::listenServer()
 
 //	      bl->preConnexion(ptr, this->_err);
 	      this->checkError();
-	      delete ptr;
+            thread.run(ptr);
 	    }
 	}
     }

@@ -11,6 +11,7 @@ ConfParser::ConfParser(const std::string & file)
   this->_search["/Zia/Logger_info/log_file"] = "apimeal-zia.log";
   this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
   this->_search["/Zia/Server_info/port"] = "80";
+  this->_docs["NO VIRTUAL HOST"] = "";
 }
 
 ConfParser::~ConfParser()
@@ -125,7 +126,9 @@ void					ConfParser::getContent(apimeal::Error & error)
       error.IsError = true;
       error.Message = "An error occured during the parsing of the xml file.";
     }
+    file.close();
   this->fillModules();
+  this->fillWebsite();
   this->fillContent();
 }
 
@@ -135,6 +138,43 @@ void					ConfParser::fillContent()
     {
       if (it->first.find("Zia/Modules") == std::string::npos && this->_search.find(it->first) != this->_search.end())
 	this->_search[it->first] = it->second;
+    }
+}
+
+
+
+void					ConfParser::fillWebsite()
+{
+  std::string	host;
+  std::string	docs;
+  std::string	tmp_h;
+  std::string	tmp_d;
+  size_t	end;
+
+  if (this->_xml.find("/Zia/Server_info/website/virtual_host") != this->_xml.end())
+    host = this->_xml["/Zia/Server_info/website/virtual_host"];
+  if (this->_xml.find("/Zia/Server_info/website/document_root") != this->_xml.end())
+    docs = this->_xml["/Zia/Server_info/website/document_root"];
+  while (!host.empty() && !docs.empty())
+    {
+      end = host.find("-");
+      if (end == std::string::npos)
+	end = host.size();
+      tmp_h = host.substr(0, end);
+      host.erase(0, (end + 1));
+
+      end = docs.find("-");
+      if (end == std::string::npos)
+	end = docs.size();
+      tmp_d = docs.substr(0, end);
+      docs.erase(0, (end + 1));
+
+      std::cout << "HOST: " << tmp_h << std::endl;
+      std::cout << "DOC ROOT: " << tmp_d << std::endl;
+      std::cout << std::endl;
+
+      this->_hosts.push_back(tmp_h);
+      this->_docs[tmp_h] = tmp_d;
     }
 }
 
@@ -196,4 +236,16 @@ const std::string &			ConfParser::getLoggerFile()
 const std::string &			ConfParser::getLoggerFormat()
 {
   return (this->_search["/Zia/Logger_info/format"]);
+}
+
+const std::vector<std::string> &	ConfParser::getVirtualHost()
+{
+  return (this->_hosts);
+}
+
+const std::string &			ConfParser::getDocumentRoot(const std::string & virtual_host)
+{
+  if (this->_docs.find(virtual_host) != this->_docs.end())
+    return this->_docs[virtual_host];
+  return this->_docs["NO VIRTUAL HOST"];
 }

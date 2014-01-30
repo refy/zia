@@ -10,13 +10,14 @@
   <Modules> <!-- Modules section, content the place for all modules -->
     <root>modules/</root> <!-- The recurrent path of all module, optionnal -->
     <path>CGIModule/libCgiModule</path> <!-- The directory path for one module -->
-    <path>ContentModule/libContentModule</path>
-    <path>PostConnexion/libPostConnexion</path>
-    <path>PreConnexion/libPreConnexion</path>
-    <path>PostGenerateResponse/libPostGenerateResponse</path>
-    <path>PostParseRequest/libPostParseRequest</path>
-    <path>PreParseRequest/libPreParseRequest</path>
-    <path>PreSendRequest/libPreSendRequest</path>
+    <path>Blacklist/libBlacklist</path>
+    <path>SSLConnexion/libSSLConnexion</path>
+    <!-- <path>PostConnexion/libPostConnexion</path> -->
+    <!-- <path>PreConnexion/libPreConnexion</path> -->
+    <!-- <path>PostGenerateResponse/libPostGenerateResponse</path> -->
+    <!-- <path>PostParseRequest/libPostParseRequest</path> -->
+    <!-- <path>PreParseRequest/libPreParseRequest</path> -->
+    <!-- <path>PreSendRequest/libPreSendRequest</path> -->
     <ext>so</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
   </Modules>
 
@@ -32,6 +33,17 @@
   </Logger_info>
 
   <Server_info>
+
+    <website>
+      <virtual_host>*:80</virtual_host>
+      <document_root>/var/www</document_root>
+    </website>
+
+    <website>
+      <virtual_host>www.toto.come</virtual_host>
+      <document_root>/var/toto/www</document_root>
+    </website>
+
     <port>8454</port>
   </Server_info>
 

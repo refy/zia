@@ -25,6 +25,8 @@ private:
   bool	checkError();
   apimeal::IConnexion	*accept_client();
 
+    static void *pipelineEntry(void *);
+    
 public:
     
     void initServer(){}
