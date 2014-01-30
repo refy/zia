@@ -26,8 +26,9 @@ int	run_server(bool debug, const std::string & conf)
 					 parser->getLoggerFile());
 
   check_error(err, log);
-  delete parser;
   server.initServer(log, parser);
+  delete parser;
+  std::cout << "PLOP" << std::endl;
   server.listenServer();
   server.closeServer();
   delete log;

@@ -24,6 +24,7 @@ private:
   bool			checkError();
   apimeal::IConnexion*	accept_client();
   static void*		pipelineEntry(void *);
+  void			printConnexionInfo(apimeal::IConnexion *ptr, const std::string & msg);
     
 public:
   void initServer(apimeal::ILogger *log, ConfParser *p);

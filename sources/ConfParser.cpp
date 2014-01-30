@@ -164,11 +164,6 @@ void					ConfParser::fillWebsite()
 	end = docs.size();
       tmp_d = docs.substr(0, end);
       docs.erase(0, (end + 1));
-
-      std::cout << "HOST: " << tmp_h << std::endl;
-      std::cout << "DOC ROOT: " << tmp_d << std::endl;
-      std::cout << std::endl;
-
       this->_hosts.push_back(tmp_h);
       this->_docs[tmp_h] = tmp_d;
     }
