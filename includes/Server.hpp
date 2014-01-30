@@ -15,6 +15,7 @@ private:
   apimeal::Error	_err;
   ModuleLoader		_loader;
     apimeal::IConnexion *_coWait;
+    ConfParser *_conf;
     
 public:
   Server(apimeal::ILogger *log, ConfParser *p, apimeal::Error & e);

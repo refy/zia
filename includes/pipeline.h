@@ -18,12 +18,13 @@
 class pipeline {
     
     apimeal::IConnexion *_client;
-    apimeal::Error _error;
+    apimeal::Error *_error;
     HttpRequest *_request;
     HttpResponse *_response;
     
     bool __continue;
     std::string fileGetContent(const std::string &fileName);
+    std::string findDocRoot();
     void readRequest();
     void postConnexion();
     void parseRequest();
@@ -32,6 +33,8 @@ class pipeline {
     void sendResponse();
     bool _continue();
     std::string genDate();
+    void getPostBody();
+    bool requestIsComplete(const std::string &);
     void writeToSocket(const std::string &content, SOCKET socket);
     void writeHeaderToSocket(const std::string &key, const std::string &value, SOCKET socket);
 public:
