@@ -9,7 +9,7 @@
 
 class	ConfParser
 {
- 
+    
     ConfParser();
     std::map<std::string, std::string>	_xml;
     std::string				_file;
@@ -18,17 +18,18 @@ class	ConfParser
     std::map<std::string, std::string>	_docs;
     std::vector<std::string>		_hosts;
     
-    void			getContent(apimeal::Error & error);
+    void			getContent();
     bool			cleanLine(std::string & line, bool comment);
     const std::string	parseLine(const std::string & line, int s);
     void			fillContent();
     void			fillModules();
     void			fillWebsite();
     static          ConfParser *_singleton;
-
+    
 public:
-
+    ConfParser(apimeal::Error & e, const std::string & file = "");
     ~ConfParser();
+    
     static ConfParser *getInstance();
     void setFile(const std::string &fileName);
     void					initialize(apimeal::Error & error);

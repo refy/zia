@@ -8,13 +8,12 @@ ConfParser *ConfParser::_singleton;
 ConfParser::ConfParser():
     _file("")
 {
-    std::cout << "PD" << std::endl;
-    this->_search["/Zia/Api/name"] = "apimeal";
-    this->_search["/Zia/Api/min_authorized_version"] = "0.1";
-    this->_search["/Zia/Logger_info/log_file"] = "apimeal-zia.log";
-    this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
-    this->_search["/Zia/Server_info/port"] = "80";
-    this->_docs["NO VIRTUAL HOST"] = "";
+  this->_search["/Zia/Api/name"] = "apimeal";
+  this->_search["/Zia/Api/min_authorized_version"] = "0.1";
+  this->_search["/Zia/Logger_info/log_file"] = "apimeal-zia.log";
+  this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
+  this->_search["/Zia/Server_info/port"] = "80";
+  this->_docs["NO VIRTUAL HOST"] = "";
 }
 
 ConfParser::~ConfParser()
@@ -30,11 +29,12 @@ ConfParser *ConfParser::getInstance()
 void ConfParser::setFile(const std::string &fileName)
 {
     this->_file = fileName;
+    this->getContent();
 }
 
 void					ConfParser::initialize(apimeal::Error & error)
 {
-    this->getContent(error);
+    this->getContent();
 }
 
 bool					ConfParser::cleanLine(std::string & line, bool comment)
@@ -89,7 +89,7 @@ const std::string			ConfParser::parseLine(const std::string & line, int s)
     return res;
 }
 
-void					ConfParser::getContent(apimeal::Error & error)
+void					ConfParser::getContent()
 {
     std::ifstream	file;
     std::string	up;
@@ -136,11 +136,11 @@ void					ConfParser::getContent(apimeal::Error & error)
             }
         }
     }
-    else
-    {
-        error.IsError = true;
-        error.Message = "An error occured during the parsing of the xml file.";
-    }
+//    else
+//    {
+//        error.IsError = true;
+//        error.Message = "An error occured during the parsing of the xml file.";
+//    }
     file.close();
     this->fillModules();
     this->fillWebsite();
@@ -172,24 +172,19 @@ void					ConfParser::fillWebsite()
         docs = this->_xml["/Zia/Server_info/website/document_root"];
     while (!host.empty() && !docs.empty())
     {
-        end = host.find("-");
-        if (end == std::string::npos)
-            end = host.size();
-        tmp_h = host.substr(0, end);
-        host.erase(0, (end + 1));
-        
-        end = docs.find("-");
-        if (end == std::string::npos)
-            end = docs.size();
-        tmp_d = docs.substr(0, end);
-        docs.erase(0, (end + 1));
-        
-        std::cout << "HOST: " << tmp_h << std::endl;
-        std::cout << "DOC ROOT: " << tmp_d << std::endl;
-        std::cout << std::endl;
-        
-        this->_hosts.push_back(tmp_h);
-        this->_docs[tmp_h] = tmp_d;
+      end = host.find("-");
+      if (end == std::string::npos)
+	end = host.size();
+      tmp_h = host.substr(0, end);
+      host.erase(0, (end + 1));
+
+      end = docs.find("-");
+      if (end == std::string::npos)
+	end = docs.size();
+      tmp_d = docs.substr(0, end);
+      docs.erase(0, (end + 1));
+      this->_hosts.push_back(tmp_h);
+      this->_docs[tmp_h] = tmp_d;
     }
 }
 

@@ -29,13 +29,13 @@
   <Server_info>
 
     <website>
-      <virtual_host>*:80</virtual_host>
+      <virtual_host>*</virtual_host>
       <document_root>/var/www</document_root>
     </website>
 
     <website>
-      <virtual_host>www.toto.come</virtual_host>
-      <document_root>/var/toto/www</document_root>
+      <virtual_host>toto.com</virtual_host>
+      <document_root>/var/www/toto</document_root>
     </website>
 
     <port>8454</port>
