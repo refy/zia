@@ -28,7 +28,6 @@ void pipeline::preParseRequest()
         for (ite = this->_moduleLoader->getSortedMap().at(apimeal::PREPARSEREQUEST).begin(); ite != this->_moduleLoader->getSortedMap().at(apimeal::PREPARSEREQUEST).end(); ++ite)
         {
             (*ite)->preParseRequest(this->_request, *this->_error);
-            std::cout << "13" << std::endl;
         }
     }
 }
@@ -42,7 +41,6 @@ void pipeline::postParseRequest()
         for (ite = this->_moduleLoader->getSortedMap().at(apimeal::POSTPARSEREQUEST).begin(); ite != this->_moduleLoader->getSortedMap().at(apimeal::POSTPARSEREQUEST).end(); ++ite)
         {
             (*ite)->postParseRequest(this->_request, *this->_error);
-            std::cout << "12" << std::endl;
         }
     }
 }
@@ -60,12 +58,16 @@ void pipeline::parseRequest(){
     {
         std::string param = request.substr(0, request.find('\n'));
         if (param.size() > 0)
-            this->_request->addHeader(param.substr(0, param.find(':')), param.substr(param.find(':') + 1));
+        {
+            std::string value = param.substr(param.find(':') + 2);
+            while (value.find('\n') != value.npos || value.find('\r') != value.npos)
+                value = value.substr(0, value.size() - 1);
+            this->_request->addHeader(param.substr(0, param.find(':')), value);
+        }
         if (request.find('\n') != request.npos)
             request = request.substr(request.find('\n') + 1);
         else
             request = "";
-        std::cout << "11" << std::endl;
     }
     this->postParseRequest();
 }
@@ -125,7 +127,9 @@ std::string pipeline::fileGetContent(const std::string &fileName)
             infile.seekg(0, std::ios::beg);
             infile.read(&content[0], content.size());
             infile.close();
-            std::string extension = realFile.substr(realFile.rfind("."));
+            std::string extension;
+            if (realFile.rfind('.') != realFile.npos)
+                extension = realFile.substr(realFile.rfind("."));
             this->setExtensionHeader(extension);
         }
         infile.close();
@@ -151,7 +155,6 @@ void pipeline::getPostBody()
         buffer[readed] = 0;
         body += buffer;
         pos += readed;
-        std::cout << "10" << std::endl;
     } while (pos < bodySize && readed > 0);
     
     this->_request->setBody(body);
@@ -169,7 +172,6 @@ void pipeline::getContent()
         {
             (*ite)->contentModule(this->_request, *this->_error);
             contentModule = true;
-            std::cout << "9" << std::endl;
         }
     }
     
@@ -206,7 +208,6 @@ void pipeline::preGenerateResponse()
         for (ite = this->_moduleLoader->getSortedMap().at(apimeal::CGIMODULE).begin(); ite != this->_moduleLoader->getSortedMap().at(apimeal::CGIMODULE).end(); ++ite)
         {
             (*ite)->CGIModule(this->_request, *this->_error);
-            std::cout << "8" << std::endl;
         }
     }
 }
@@ -220,7 +221,6 @@ void pipeline::postGenerateResponse()
         for (ite = this->_moduleLoader->getSortedMap().at(apimeal::POSTGENERATERESPONSE).begin(); ite != this->_moduleLoader->getSortedMap().at(apimeal::POSTGENERATERESPONSE).end(); ++ite)
         {
             (*ite)->postGenerateResponse(this->_response, *this->_error);
-            std::cout << "7" << std::endl;
         }
     }
 }
@@ -257,7 +257,6 @@ void pipeline::writeToSocket(const std::string &content, SOCKET socket)
         else
             write(socket, toWrite + pos, length - pos);
         pos += 2048;
-        std::cout << "6" << std::endl;
     }
 }
 
@@ -279,7 +278,6 @@ void pipeline::preSendResponse()
         for (ite = this->_moduleLoader->getSortedMap().at(apimeal::SENDREQUEST).begin(); ite != this->_moduleLoader->getSortedMap().at(apimeal::SENDREQUEST).end(); ++ite)
         {
             (*ite)->preSendRequest(this->_response, *this->_error);
-            std::cout << "5" << std::endl;
         }
     }
 }
@@ -298,7 +296,6 @@ void pipeline::sendResponse()
     {
         writeHeaderToSocket(ite->first, ite->second, this->_client->getSocket());
         ++ite;
-        std::cout << "4" << std::endl;
     }
     writeToSocket("\n", this->_client->getSocket());
     writeToSocket(this->_response->getBody(), this->_client->getSocket());
@@ -331,7 +328,6 @@ void pipeline::readRequest()
             buffer[readed] = 0;
             request += buffer;
         }
-        std::cout << "3" << std::endl;
     } while ((readed >= 255 || this->requestIsComplete(request) == false) && readed > 0);
     if (request.size() == 0)
         this->__continue = false;
@@ -347,7 +343,6 @@ void pipeline::postConnexion(){
         for (ite = this->_moduleLoader->getSortedMap().at(apimeal::POSTCONNEXION).begin(); ite != this->_moduleLoader->getSortedMap().at(apimeal::POSTCONNEXION).end(); ++ite)
         {
             (*ite)->postConnexion(this->_client, *this->_error);
-            std::cout << "2" << std::endl;
         }
     }
     if (this->_client->getRequest().size() <= 0)
@@ -363,13 +358,14 @@ void pipeline::run(){
         this->postConnexion();
         this->parseRequest();
         this->getContent();
+        if ( this->_request->getHeaders().find("Host") !=  this->_request->getHeaders().end())
+        std::cout << ">" << this->_request->getHeaders().at("Host") << "<" << std::endl;
         this->generateResponse();
         this->sendResponse();
         delete this->_response;
         delete this->_request;
         delete this->_error;
         this->_client->setRequest("");
-        std::cout << "1" << std::endl;
     }
     close(this->_client->getSocket());
 }

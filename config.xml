@@ -30,12 +30,17 @@
 
     <website>
       <virtual_host>*</virtual_host>
-      <document_root>/var/www</document_root>
+      <document_root>/var/www/</document_root>
     </website>
 
     <website>
       <virtual_host>toto.com</virtual_host>
       <document_root>/var/www/toto</document_root>
+    </website>
+
+    <website>
+        <virtual_host>localhost:8454</virtual_host>
+        <document_root>/var/www/supinfo/</document_root>
     </website>
 
     <port>8454</port>
