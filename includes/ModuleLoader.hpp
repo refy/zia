@@ -15,7 +15,7 @@ class	ModuleLoader
 private:
     std::map<std::string, apimeal::AModule*>		_mod;
     
-    std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>> _sortedMod;
+    std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *> > _sortedMod;
 #if defined	(_WIN32)
     std::map<std::string, HMODULE>	_handles;
 #else
@@ -36,7 +36,7 @@ public:
 public:
     apimeal::AModule*	getModule(const std::string & m, apimeal::Error & e);
     const std::map<std::string, apimeal::AModule*>    &getModuleMap()const;
-    const std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>> &getSortedMap();
+    const std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *> > &getSortedMap();
 };
 
 #endif

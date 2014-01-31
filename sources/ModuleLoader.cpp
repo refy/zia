@@ -59,17 +59,26 @@ void sortModuleVector(std::vector<apimeal::AModule *> moduleVector, apimeal::eTy
                 std::iter_swap(ite, ite +1);
 }
 
+#include <iostream>
+
 void ModuleLoader::sortModules()
 {
     std::map<std::string, apimeal::AModule*>::const_iterator ite;
     std::map<apimeal::eTypeModule, apimeal::ePriority>::const_iterator mite;
-    std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>>::const_iterator site;
+    std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *> >::const_iterator site;
     
     for (ite = this->_mod.begin(); ite != this->_mod.end(); ++ite)
+    {
         for (mite = ite->second->getPriority().begin(); mite != ite->second->getPriority().end(); ++mite)
             this->_sortedMod[mite->first].push_back(ite->second);
+    }
+    std::cout << "PD1" << std::endl;
     for (site = this->_sortedMod.begin(); site != this->_sortedMod.end(); ++site)
+    {
+        std::cout << "PD2" << std::endl;
         sortModuleVector(site->second, site->first);
+    }
+    std::cout << "PD3" << std::endl;
 }
 
 void	ModuleLoader::LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log)
@@ -157,7 +166,7 @@ const std::map<std::string, apimeal::AModule*>    &ModuleLoader::getModuleMap()c
     return this->_mod;
 }
 
-const std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>> &ModuleLoader::getSortedMap()
+const std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *> > &ModuleLoader::getSortedMap()
 {
     return this->_sortedMod;
 }
