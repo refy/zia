@@ -14,6 +14,7 @@
 #include "Error.hpp"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
+#include "ModuleLoader.hpp"
 
 class pipeline {
     
@@ -21,7 +22,9 @@ class pipeline {
     apimeal::Error *_error;
     HttpRequest *_request;
     HttpResponse *_response;
+    ModuleLoader *_moduleLoader;
     
+    void setExtensionHeader(const std::string &ext);
     bool __continue;
     std::string fileGetContent(const std::string &fileName);
     std::string findDocRoot();
@@ -29,17 +32,25 @@ class pipeline {
     void postConnexion();
     void parseRequest();
     void getContent();
+    void preSendResponse();
+    void preGenerateResponse();
+    void postGenerateResponse();
     void generateResponse();
     void sendResponse();
     bool _continue();
     std::string genDate();
     void getPostBody();
+
+    void preParseRequest();
+
+    void postParseRequest();
+    
     bool requestIsComplete(const std::string &);
     void writeToSocket(const std::string &content, SOCKET socket);
     void writeHeaderToSocket(const std::string &key, const std::string &value, SOCKET socket);
 public:
     
-    pipeline(apimeal::IConnexion *);
+    pipeline(apimeal::IConnexion *, ModuleLoader *moduleLoader);
     void run();
     
 };

@@ -13,25 +13,30 @@
 class	ModuleLoader
 {
 private:
-  std::map<std::string, apimeal::AModule*>		_mod;
+    std::map<std::string, apimeal::AModule*>		_mod;
+    
+    std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>> _sortedMod;
 #if defined	(_WIN32)
-  std::map<std::string, HMODULE>	_handles;
+    std::map<std::string, HMODULE>	_handles;
 #else
-  std::map<std::string, void*>		_handles;
+    std::map<std::string, void*>		_handles;
 #endif
 
+    void sortModules();
 public:
-  ModuleLoader();
-  ModuleLoader(const std::vector<std::string> & modules, apimeal::Error & e, apimeal::ILogger *log);
-  ~ModuleLoader();
-
+    ModuleLoader();
+    ModuleLoader(const std::vector<std::string> & modules, apimeal::Error & e, apimeal::ILogger *log);
+    ~ModuleLoader();
+    
 public:
-  void	LoadModules(const std::vector<std::string> & m, apimeal::Error & e, apimeal::ILogger *log);
-  void	LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log);
-  void	UnloadModule(const std::string & module);
-
+    void	LoadModules(const std::vector<std::string> & m, apimeal::Error & e, apimeal::ILogger *log);
+    void	LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log);
+    void	UnloadModule(const std::string & module);
+    
 public:
-  apimeal::AModule*	getModule(const std::string & m, apimeal::Error & e);
+    apimeal::AModule*	getModule(const std::string & m, apimeal::Error & e);
+    const std::map<std::string, apimeal::AModule*>    &getModuleMap()const;
+    const std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>> &getSortedMap();
 };
 
 #endif

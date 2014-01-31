@@ -11,98 +11,153 @@ ModuleLoader::ModuleLoader()
 
 ModuleLoader::ModuleLoader(const std::vector<std::string> & modules, apimeal::Error & e, apimeal::ILogger *log)
 {
-  for (std::vector<std::string>::const_iterator it = modules.begin();it != modules.end();++it)
-    this->LoadModule((*it), e, log);
+    for (std::vector<std::string>::const_iterator it = modules.begin();it != modules.end();++it)
+        this->LoadModule((*it), e, log);
+    this->sortModules();
 }
 
 ModuleLoader::~ModuleLoader()
 {
-  for (std::map<std::string, apimeal::AModule*>::iterator it = this->_mod.begin();it != this->_mod.end();++it)
-    this->UnloadModule((it->first));
+    for (std::map<std::string, apimeal::AModule*>::iterator it = this->_mod.begin();it != this->_mod.end();++it)
+        this->UnloadModule((it->first));
 }
 
 void	ModuleLoader::LoadModules(const std::vector<std::string> & m, apimeal::Error & error, apimeal::ILogger *log)
 {
-  for (std::vector<std::string>::const_iterator it = m.begin();it != m.end();++it)
-    this->LoadModule((*it), error, log);
+    for (std::vector<std::string>::const_iterator it = m.begin();it != m.end();++it)
+        this->LoadModule((*it), error, log);
+}
+
+bool sortMod(apimeal::AModule *f, apimeal::AModule *s)
+{
+    return f->getPriority() > s->getPriority();
+}
+
+#include <algorithm>
+
+// FAIRE DES TESTS !!!!111!!!!!
+
+bool isModuleVectorSorted(std::vector<apimeal::AModule *> moduleVector, apimeal::eTypeModule type)
+{
+    std::vector<apimeal::AModule *>::const_iterator ite;
+    
+    for (ite = moduleVector.begin(); ite != moduleVector.end() && (ite + 1) != moduleVector.end(); ++ite)
+    {
+        if ((*ite)->getPriority()[type] > (*(ite + 1))->getPriority()[type])
+            return false;
+    }
+    return true;
+}
+
+void sortModuleVector(std::vector<apimeal::AModule *> moduleVector, apimeal::eTypeModule type)
+{
+    std::vector<apimeal::AModule *>::iterator ite;
+    
+    while (isModuleVectorSorted(moduleVector, type) == false)
+        for (ite = moduleVector.begin(); ite != moduleVector.end() && (ite + 1) != moduleVector.end(); ++ite)
+            if ((*ite)->getPriority()[type] > (*(ite + 1))->getPriority()[type])
+                std::iter_swap(ite, ite +1);
+}
+
+void ModuleLoader::sortModules()
+{
+    std::map<std::string, apimeal::AModule*>::const_iterator ite;
+    std::map<apimeal::eTypeModule, apimeal::ePriority>::const_iterator mite;
+    std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>>::const_iterator site;
+    
+    for (ite = this->_mod.begin(); ite != this->_mod.end(); ++ite)
+        for (mite = ite->second->getPriority().begin(); mite != ite->second->getPriority().end(); ++mite)
+            this->_sortedMod[mite->first].push_back(ite->second);
+    for (site = this->_sortedMod.begin(); site != this->_sortedMod.end(); ++site)
+        sortModuleVector(site->second, site->first);
 }
 
 void	ModuleLoader::LoadModule(const std::string & module, apimeal::Error & error, apimeal::ILogger *log)
 {
-  apimeal::AModule* (*mod)(apimeal::ILogger *);
-  apimeal::AModule* m;
-  std::string	modName;
-
+    apimeal::AModule* (*mod)(apimeal::ILogger *);
+    apimeal::AModule* m;
+    std::string	modName;
+    
 #if defined	(_WIN32)
-  HMODULE	handle = LoadLibrary(module.c_str());
-
-  if (handle == NULL)
+    HMODULE	handle = LoadLibrary(module.c_str());
+    
+    if (handle == NULL)
     {
-      error.IsError = true;
-      error.Message += "Cannot open library: " + module + "\n";
-      return ;
+        error.IsError = true;
+        error.Message += "Cannot open library: " + module + "\n";
+        return ;
     }
-
-  mod = (apimeal::AModule* (*)(apimeal::ILogger *))GetProcAddress(handle, "LoadModule");
-
-  if (mod == NULL)
+    
+    mod = (apimeal::AModule* (*)(apimeal::ILogger *))GetProcAddress(handle, "LoadModule");
+    
+    if (mod == NULL)
     {
-      error.IsError = true;
-      error.Message += "Cannot load symbole 'LoadModule' for the module named " + module + "\n";
-      FreeLibrary(handle);
-      return ;
+        error.IsError = true;
+        error.Message += "Cannot load symbole 'LoadModule' for the module named " + module + "\n";
+        FreeLibrary(handle);
+        return ;
     }
 #else
-  void	*handle = dlopen(module.c_str(), RTLD_LAZY);
-
-  if (!handle)
+    void	*handle = dlopen(module.c_str(), RTLD_LAZY);
+    
+    if (!handle)
     {
-      error.IsError = true;
-      error.Message += "Cannot open library: " + module + "\n";
-      return ;
+        error.IsError = true;
+        error.Message += "Cannot open library: " + module + "\n";
+        return ;
     }
-
-  mod = (apimeal::AModule* (*)(apimeal::ILogger *)) dlsym(handle, "LoadModule");
-  const char	*dlsym_error = dlerror();
-  if (dlsym_error)
+    
+    mod = (apimeal::AModule* (*)(apimeal::ILogger *)) dlsym(handle, "LoadModule");
+    const char	*dlsym_error = dlerror();
+    if (dlsym_error)
     {
-      error.IsError = true;
-      error.Message += "Cannot load symbole 'LoadModule' for the module named " + module + "\n";
-      dlclose(handle);
-      return ;
+        error.IsError = true;
+        error.Message += "Cannot load symbole 'LoadModule' for the module named " + module + "\n";
+        dlclose(handle);
+        return ;
     }
-  this->_handles[module] = handle;
+    this->_handles[module] = handle;
 #endif
-  m = mod(log);
-  modName = m->getName();
-  if (!modName.empty())
+    m = mod(log);
+    modName = m->getName();
+    if (!modName.empty())
     {
-      this->_mod[modName] = m;
-      this->_handles[modName] = handle;
+        this->_mod[modName] = m;
+        this->_handles[modName] = handle;
     }
 }
 
 void	ModuleLoader::UnloadModule(const std::string & module)
 {
-
-  if (this->_handles.find(module) != this->_handles.end())
+    
+    if (this->_handles.find(module) != this->_handles.end())
     {
 #if defined	(_WIN32)
-      FreeLibrary(this->_handles[module]);
+        FreeLibrary(this->_handles[module]);
 #else
-      dlclose(this->_handles[module]);
+        dlclose(this->_handles[module]);
     }
 #endif
 }
 
 apimeal::AModule*	ModuleLoader::getModule(const std::string & m, apimeal::Error & e)
 {
-  if (this->_mod.find(m) != this->_mod.end())
-    return this->_mod[m];
-  else
+    if (this->_mod.find(m) != this->_mod.end())
+        return this->_mod[m];
+    else
     {
-      e.IsError = true;
-      e.Message += "The module " + m + " doesn't exist.\n";
-      return NULL;
+        e.IsError = true;
+        e.Message += "The module " + m + " doesn't exist.\n";
+        return NULL;
     }
+}
+
+const std::map<std::string, apimeal::AModule*>    &ModuleLoader::getModuleMap()const
+{
+    return this->_mod;
+}
+
+const std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *>> &ModuleLoader::getSortedMap()
+{
+    return this->_sortedMod;
 }

@@ -52,7 +52,6 @@ int	main(int ac, char **av)
     Server	server(log, parser);
     
     check_error(err, log);
-    
     server.listenServer();
     
     delete log;
