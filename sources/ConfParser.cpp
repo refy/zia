@@ -147,6 +147,7 @@ void					ConfParser::getContent()
     this->fillModules();
     this->fillWebsite();
     this->fillContent();
+    this->_xml.clear();
 }
 
 void					ConfParser::fillContent()
