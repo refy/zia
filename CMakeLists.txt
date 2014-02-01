@@ -13,6 +13,7 @@ set(SOURCES ${SDIR}main.cpp ${SDIR}ModuleLoader.cpp ${SDIR}Server.cpp ${SDIR}Con
   ${SDIR}HttpRequest.cpp ${SDIR}pipeline.cpp)
 
 add_executable(zia ${SOURCES})
+add_executable(launcher ${SDIR}launcher.cpp)
 
 if (UNIX)
   target_link_libraries(zia dl)
