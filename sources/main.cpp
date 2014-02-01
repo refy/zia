@@ -20,8 +20,9 @@ bool	check_error(apimeal::Error & e, apimeal::ILogger *log)
 int	main(int ac, char **av)
 {
     bool			debug = false;
-    std::string		conf = "config.xml";
-    apimeal::Error err;
+    std::string			conf = "config.xml";
+    apimeal::Error		err;
+    Logger			*log;
     
     for (int i = 1;i < ac;i++)
     {
@@ -41,10 +42,10 @@ int	main(int ac, char **av)
     
     ConfParser	*parser = ConfParser::getInstance();
     parser->setFile(conf);
-    
+
     parser->initialize(err);
-    
-    Logger	*log = new Logger(parser->getLoggerFormat(), debug,
+
+    log = Logger::getInstance(parser->getLoggerFormat(), debug,
                               parser->getLoggerFile());
     
     check_error(err, log);
@@ -54,6 +55,6 @@ int	main(int ac, char **av)
     check_error(err, log);
     server.listenServer();
     
-    delete log;
+    log->kill();
     return (0);
 }

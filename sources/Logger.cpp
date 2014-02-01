@@ -9,6 +9,8 @@
 # include	<ctime>
 #endif
 
+Logger*	Logger::_singleton = NULL;
+
 Logger::Logger(const std::string & msgFormat, bool debug, const std::string & logFile)
   : _debug(debug), _msgFormat(msgFormat), _logFile(logFile)
 {
@@ -22,6 +24,22 @@ Logger::~Logger()
 {
   this->LogInfo("--- End ---");
   this->_stream.close();
+}
+
+Logger*			Logger::getInstance(const std::string & msgFormat, bool debug, const std::string & logFile)
+{
+  if (_singleton == NULL)
+    _singleton = new Logger(msgFormat, debug, logFile);
+  return (_singleton);
+}
+
+void			Logger::kill()
+{
+  if (_singleton != NULL)
+    {
+      delete _singleton;
+      _singleton = NULL;
+    }
 }
 
 const std::string	Logger::getMsgFormated(const std::string & msg, const std::string & type)
