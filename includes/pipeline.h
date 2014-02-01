@@ -45,7 +45,7 @@ class pipeline {
 
     void postParseRequest();
     
-    bool requestIsComplete(const std::string &);
+    bool requestIsComplete(std::string &);
     void writeToSocket(const std::string &content, SOCKET socket);
     void writeHeaderToSocket(const std::string &key, const std::string &value, SOCKET socket);
 public:

@@ -9,7 +9,11 @@ SSLConnexion::~SSLConnexion()
 {}
 
 std::map<apimeal::eTypeModule, apimeal::ePriority>	SSLConnexion::getPriority() const
-{}
+{
+  std::map<apimeal::eTypeModule, apimeal::ePriority> ret;
+
+  return ret;
+}
 
 const apimeal::Version &		SSLConnexion::getVersion() const
 {

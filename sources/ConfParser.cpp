@@ -17,7 +17,9 @@ ConfParser::ConfParser():
 }
 
 ConfParser::~ConfParser()
-{}
+{
+    std::cout << "LOL " << std::endl;
+}
 
 ConfParser *ConfParser::getInstance()
 {

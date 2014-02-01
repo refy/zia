@@ -14,10 +14,14 @@
 #include <fcntl.h>
 #include "ConfParser.hpp"
 #include "AModule.hpp"
+#include "Logger.hpp"
+#include "ModuleLoader.hpp"
 
 pipeline::pipeline(apimeal::IConnexion *client, ModuleLoader *moduleLoader):
 _client(client), __continue(true), _moduleLoader(moduleLoader)
-{}
+{
+//    this->_moduleLoader = new ModuleLoader(ConfParser::getInstance()->getModulesPath(), *this->_error, NULL);
+}
 
 void pipeline::preParseRequest()
 {
@@ -45,29 +49,116 @@ void pipeline::postParseRequest()
     }
 }
 
+std::pair<unsigned long, unsigned long> findCRLF(const std::string &string)
+{
+    std::pair<unsigned long, unsigned long> ret;
+    
+    if ( (ret.first = string.find("\r\n")) != string.npos)
+    {
+        ret.second = ret.first + 2;
+        return ret;
+    }
+    if ( (ret.first = string.find('\n')) != string.npos)
+    {
+        ret.second = ret.first + 1;
+        return ret;
+    }
+    if ( (ret.first = string.find('\r')) != string.npos)
+    {
+        ret.second = ret.first + 1;
+        return ret;
+    }
+    ret.first = string.npos;
+    ret.second = string.npos;
+    return ret;
+}
+
+std::pair<unsigned long, unsigned long> findS(const std::string &string, const std::string &S)
+{
+    std::pair<unsigned long, unsigned long> ret;
+    
+    if ( (ret.first = string.find(S)) != string.npos)
+    {
+        ret.second = ret.first + S.size();
+        return ret;
+    }
+    ret.first = string.npos;
+    ret.second = string.npos;
+    return ret;
+}
+
+std::string getCRLFLine(std::string &string)
+{
+    std::string ret;
+    std::pair<unsigned long, unsigned long> pos;
+    
+    pos = findCRLF(string);
+    if (pos.first != string.npos)
+    {
+        ret = string.substr(0, pos.first);
+        string = string.substr(pos.second);
+        return ret;
+    }
+    ret = string;
+    string = "";
+    return ret;
+}
+
 void pipeline::parseRequest(){
     this->preParseRequest();
+    std::string line;
     std::string request = this->_client->getRequest();
-    this->_request->setMethod(request.substr(0, request.find(' ')));
-    request = request.substr(request.find(' ') + 1);
-    this->_request->setRequestURI(request.substr(0, request.find(' ')));
-    request = request.substr(request.find(' ') + 1);
-    this->_request->setHttpVersion(request.substr(0, request.find('\n') - 1));
-    request = request.substr(request.find('\n') + 1);
-    while (request.size())
+    unsigned long pos;
+    
+//    std::cout << "REQUEST" << std::endl << request << std::endl << "END" << std::endl;
+    
+    //    pos = request.find(' ');
+    //    if (pos != request.npos)
+    //        this->_request->setMethod(request.substr(0, request.find(' ')));
+    //    request = request.substr(request.find(' ') + 1);
+    //    this->_request->setRequestURI(request.substr(0, request.find(' ')));
+    //    request = request.substr(request.find(' ') + 1);
+    //    this->_request->setHttpVersion(request.substr(0, request.find("\r\n") - 1));
+    //    request = request.substr(request.find("\r\n") + 2);
+    
+    line = getCRLFLine(request);
+    if (line.size())
     {
-        std::string param = request.substr(0, request.find('\n'));
-        if (param.size() > 0)
+        if ((pos = line.find(' ')) != line.npos)
         {
-            std::string value = param.substr(param.find(':') + 2);
-            while (value.find('\n') != value.npos || value.find('\r') != value.npos)
-                value = value.substr(0, value.size() - 1);
-            this->_request->addHeader(param.substr(0, param.find(':')), value);
+            this->_request->setMethod(line.substr(0, pos));
+            line = line.substr(pos + 1);
+            if ((pos = line.find(' ')) != line.npos)
+            {
+                this->_request->setRequestURI(line.substr(0, pos));
+                this->_request->setHttpVersion(line.substr(pos + 1));
+            }
         }
-        if (request.find('\n') != request.npos)
-            request = request.substr(request.find('\n') + 1);
         else
-            request = "";
+            this->_request->setMethod(line);
+        while (request.size())
+        {
+            line = getCRLFLine(request);
+            if (line.size() > 0 && (pos = line.find(": ")) != line.npos)
+            {
+                std::string value = line.substr(pos + 2);
+                std::string param = line.substr(0, pos);
+//                while (value.find('\n') != value.npos || value.find('\r') != value.npos)
+//                    value = value.substr(0, value.size() - 1);
+//                std::cout << value << std::endl;
+//                if (value.size() > 30)
+//                {
+//                    std::cout << "PARAM" << std::endl << param << std::endl;
+//                    std::cout << "VALUE" << std::endl << value << std::endl;
+//                }
+
+                this->_request->addHeader(param, value);
+            }
+        }
+    }
+    if (this->_request->getHeaders().find("Host") != this->_request->getHeaders().end())
+    {
+        this->_request->setRequestURI(this->findDocRoot() + this->_request->getRequestURI());
     }
     this->postParseRequest();
 }
@@ -109,12 +200,11 @@ void pipeline::setExtensionHeader(const std::string &ext)
 std::string pipeline::fileGetContent(const std::string &fileName)
 {
     std::string content;
-    std::string realFile = this->findDocRoot() + fileName;
     
     if (this->_error->IsError == false)
     {
         std::ifstream infile;
-        infile.open(realFile.c_str());
+        infile.open(fileName.c_str());
         if (infile.is_open() == false)
         {
             this->_response->setStatusCode(404);
@@ -128,8 +218,8 @@ std::string pipeline::fileGetContent(const std::string &fileName)
             infile.read(&content[0], content.size());
             infile.close();
             std::string extension;
-            if (realFile.rfind('.') != realFile.npos)
-                extension = realFile.substr(realFile.rfind("."));
+            if (fileName.rfind('.') != fileName.npos)
+                extension = fileName.substr(fileName.rfind("."));
             this->setExtensionHeader(extension);
         }
         infile.close();
@@ -307,8 +397,12 @@ bool pipeline::_continue(){
     return this->__continue;
 }
 
-bool pipeline::requestIsComplete(const std::string &request)
+bool pipeline::requestIsComplete(std::string &request)
 {
+    while (request.find('\n') == 0 || request.find('\r') == 0)
+    {
+        request = request.substr(0, 1);
+    }
     if (request.find("\r\n\r\n") != request.npos || request.find("\n\n") != request.npos)
         return true;
     return false;
@@ -319,7 +413,7 @@ void pipeline::readRequest()
     std::string request;
     long readed = 0;
     char buffer[256];
-
+    
     do
     {
         readed = read(this->_client->getSocket(), buffer, 255);
@@ -358,8 +452,6 @@ void pipeline::run(){
         this->postConnexion();
         this->parseRequest();
         this->getContent();
-        if ( this->_request->getHeaders().find("Host") !=  this->_request->getHeaders().end())
-        std::cout << ">" << this->_request->getHeaders().at("Host") << "<" << std::endl;
         this->generateResponse();
         this->sendResponse();
         delete this->_response;

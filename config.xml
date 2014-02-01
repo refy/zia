@@ -8,11 +8,9 @@
   </Api>
 
   <Modules> <!-- Modules section, content the place for all modules -->
-    <root>modules/</root> <!-- The recurrent path of all module, optionnal -->
-    <path>CGIModule/libCgiModule</path> <!-- The directory path for one module -->
-    <path>Blacklist/libBlacklist</path>
-    <path>SSLConnexion/libSSLConnexion</path>
-    <ext>so</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
+    <root>/etc/lighthttpd/modules</root> <!-- The recurrent path of all module, optionnal -->
+    <path>/mod_base/libmod_root</path>
+    <ext>dylib</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
   </Modules>
 
   <Logger_info>
@@ -30,7 +28,7 @@
 
     <website>
       <virtual_host>*</virtual_host>
-      <document_root>/var/www/</document_root>
+      <document_root>/var/www/supinfo/</document_root>
     </website>
 
     <website>

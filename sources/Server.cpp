@@ -78,8 +78,8 @@ void *Server::pipelineEntry(void *param)
     // postConnexion;
     pipeline pipe(client, moduleLoader);
     pipe.run();
-    delete client;
-    delete moduleLoader;
+//    delete client;
+//    delete moduleLoader;
     return NULL;
 }
 
