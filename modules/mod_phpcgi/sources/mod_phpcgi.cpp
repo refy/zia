@@ -53,7 +53,6 @@ char**                          mod_phpcgi::createEnv(apimeal::IHttpRequest* req
     {
         query = script.substr(script.find("?") + 1);
         script = script.substr(0, script.find("?"));
-        std::cout << query << std::endl;
     }
     env["PATH_TRANSLATED"] = script;
     env["SCRIPT_FILENAME"] = script;
@@ -144,7 +143,6 @@ void mod_phpcgi::CGIModule (apimeal::IHttpRequest *resp, apimeal::Error &e)
             std::string bin("/usr/bin/php-cgi");
             char *argv[] = {
                 strdup("/usr/bin/php-cgi"),
-                strdup("BITE=BATE"),
                 NULL
             };
             close(this->clientSock);
@@ -182,7 +180,6 @@ void mod_phpcgi::CGIModule (apimeal::IHttpRequest *resp, apimeal::Error &e)
                 this->PHPerror = true;
             }
             this->cgiContent = bdy;
-            std::cout << this->cgiContent << std::endl;
             close(pipe_out[0]);
         }
     }
@@ -215,11 +212,7 @@ void mod_phpcgi::preSendRequest (apimeal::IHttpResponse *resp, apimeal::Error &)
         header = bdy.substr(0, pos);
         if (pos != std::string::npos) {
             phpBody = bdy.substr(pos + 4);
-            
-            char *tmp;
             size = phpBody.size();
-            std::cout << "body " << phpBody << std::endl;
-
             resp->setBody(phpBody);
         }
         
