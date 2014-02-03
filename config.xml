@@ -8,8 +8,9 @@
   </Api>
 
   <Modules> <!-- Modules section, content the place for all modules -->
-    <root>/etc/lighthttpd/modules</root> <!-- The recurrent path of all module, optionnal -->
-    <path>/mod_base/libmod_root</path>
+    <root>/</root> <!-- The recurrent path of all module, optionnal -->
+    <path>/Users/Jordan/Documents/Ziare/zia/modules/mod_dir/libmod_dir</path>
+    <path>/Users/Jordan/Documents/Ziare/zia/modules/mod_phpcgi/libmod_phpcgi</path>
     <ext>dylib</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
   </Modules>
 
@@ -41,7 +42,7 @@
         <document_root>/var/www/supinfo/</document_root>
     </website>
 
-    <port>8454</port>
+    <port>8883</port>
   </Server_info>
 
 </Zia>

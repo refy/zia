@@ -61,7 +61,6 @@ apimeal::IConnexion*	Server::accept_client()
     signal(SIGPIPE, SIG_IGN);
     if ((s_tmp = accept(this->_coWait->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)
     {
-        std::cout << "Errno " << errno << std::endl;
         return (0);
     }
     apimeal::IConnexion *ptr = new ConnexionClient(sin_tmp, s_tmp);

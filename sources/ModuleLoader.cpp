@@ -1,3 +1,6 @@
+#include <iostream>
+#include <algorithm>
+
 #if defined	(_WIN32)
 #include	<windows.h>
 #else
@@ -33,8 +36,6 @@ bool sortMod(apimeal::AModule *f, apimeal::AModule *s)
     return f->getPriority() > s->getPriority();
 }
 
-#include <algorithm>
-
 // FAIRE DES TESTS !!!!111!!!!!
 
 bool isModuleVectorSorted(std::vector<apimeal::AModule *> moduleVector, apimeal::eTypeModule type)
@@ -59,17 +60,30 @@ void sortModuleVector(std::vector<apimeal::AModule *> moduleVector, apimeal::eTy
                 std::iter_swap(ite, ite +1);
 }
 
-#include <iostream>
-
 void ModuleLoader::sortModules()
 {
     std::map<std::string, apimeal::AModule*>::const_iterator ite;
-    std::map<apimeal::eTypeModule, apimeal::ePriority>::const_iterator mite;
     std::map<apimeal::eTypeModule, std::vector<apimeal::AModule *> >::const_iterator site;
     
     for (ite = this->_mod.begin(); ite != this->_mod.end(); ++ite)
-        for (mite = ite->second->getPriority().begin(); mite != ite->second->getPriority().end(); ++mite)
-            this->_sortedMod[mite->first].push_back(ite->second);
+    {
+        if (ite->second->getPriority().find(apimeal::PRECONNEXION) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::PRECONNEXION].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::POSTCONNEXION) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::POSTCONNEXION].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::PREPARSEREQUEST) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::PREPARSEREQUEST].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::POSTPARSEREQUEST) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::POSTPARSEREQUEST].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::CONTENTMODULE) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::CONTENTMODULE].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::CGIMODULE) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::CGIMODULE].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::POSTGENERATERESPONSE) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::POSTGENERATERESPONSE].push_back(ite->second);
+        if (ite->second->getPriority().find(apimeal::SENDREQUEST) != ite->second->getPriority().end())
+            this->_sortedMod[apimeal::SENDREQUEST].push_back(ite->second);
+    }
     for (site = this->_sortedMod.begin(); site != this->_sortedMod.end(); ++site)
         sortModuleVector(site->second, site->first);
 }

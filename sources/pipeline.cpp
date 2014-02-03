@@ -104,23 +104,18 @@ std::string getCRLFLine(std::string &string)
     return ret;
 }
 
+bool isHeaderComplete(const std::string &string)
+{
+    if (string.find("\r\n") == 0 || string.find("\n") == 0 || string.find("\r") == 0)
+        return true;
+    return false;
+}
+
 void pipeline::parseRequest(){
     this->preParseRequest();
     std::string line;
     std::string request = this->_client->getRequest();
     unsigned long pos;
-    
-//    std::cout << "REQUEST" << std::endl << request << std::endl << "END" << std::endl;
-    
-    //    pos = request.find(' ');
-    //    if (pos != request.npos)
-    //        this->_request->setMethod(request.substr(0, request.find(' ')));
-    //    request = request.substr(request.find(' ') + 1);
-    //    this->_request->setRequestURI(request.substr(0, request.find(' ')));
-    //    request = request.substr(request.find(' ') + 1);
-    //    this->_request->setHttpVersion(request.substr(0, request.find("\r\n") - 1));
-    //    request = request.substr(request.find("\r\n") + 2);
-    
     line = getCRLFLine(request);
     if (line.size())
     {
@@ -133,33 +128,32 @@ void pipeline::parseRequest(){
                 this->_request->setRequestURI(line.substr(0, pos));
                 this->_request->setHttpVersion(line.substr(pos + 1));
             }
+            else
+                this->_request->setRequestURI(line);
         }
         else
             this->_request->setMethod(line);
-        while (request.size())
+        while (request.size() && isHeaderComplete(request) == false)
         {
             line = getCRLFLine(request);
             if (line.size() > 0 && (pos = line.find(": ")) != line.npos)
             {
                 std::string value = line.substr(pos + 2);
                 std::string param = line.substr(0, pos);
-//                while (value.find('\n') != value.npos || value.find('\r') != value.npos)
-//                    value = value.substr(0, value.size() - 1);
-//                std::cout << value << std::endl;
-//                if (value.size() > 30)
-//                {
-//                    std::cout << "PARAM" << std::endl << param << std::endl;
-//                    std::cout << "VALUE" << std::endl << value << std::endl;
-//                }
-
                 this->_request->addHeader(param, value);
             }
         }
     }
     if (this->_request->getHeaders().find("Host") != this->_request->getHeaders().end())
     {
+        this->_request->addHeader("RealURI", this->_request->getRequestURI());
         this->_request->setRequestURI(this->findDocRoot() + this->_request->getRequestURI());
     }
+    while (request.find("\r") ==0 || request.find("\n") == 0)
+    {
+        request = request.substr(1);
+    }
+    this->_client->setRequest(request);
     this->postParseRequest();
 }
 
@@ -229,12 +223,11 @@ std::string pipeline::fileGetContent(const std::string &fileName)
 
 void pipeline::getPostBody()
 {
-    int bodySize = atoi(this->_request->getHeaders().find("Content-Length")->second.c_str());
+    int bodySize = atoi(this->_request->getHeaders().find("Content-Length")->second.c_str()) - (int)this->_client->getRequest().size();
     int pos = 0;
     char buffer[1025];
     long readed = 0;
     std::string body;
-    
     
     do
     {
@@ -246,6 +239,10 @@ void pipeline::getPostBody()
         body += buffer;
         pos += readed;
     } while (pos < bodySize && readed > 0);
+   
+    if (body.size())
+        this->_client->setRequest(this->_client->getRequest() + body);
+    body = this->_client->getRequest().substr(0,  atoi(this->_request->getHeaders().find("Content-Length")->second.c_str()));
     
     this->_request->setBody(body);
 }
@@ -265,7 +262,7 @@ void pipeline::getContent()
         }
     }
     
-    if (contentModule == false && this->_request->getMethod() == "POST")
+    if (this->_request->getMethod() == "POST")
     {
         if (this->_request->getHeaders().find("Content-Length") != this->_request->getHeaders().end())
         {
@@ -331,7 +328,7 @@ void pipeline::generateResponse()
     this->_response->addHeader("Content-Length", oss.str());
     if (this->_request->getMethod() == "HEAD")
         this->_response->setBody("");
-    
+    this->postGenerateResponse();
 }
 
 void pipeline::writeToSocket(const std::string &content, SOCKET socket)
@@ -425,7 +422,7 @@ void pipeline::readRequest()
     } while ((readed >= 255 || this->requestIsComplete(request) == false) && readed > 0);
     if (request.size() == 0)
         this->__continue = false;
-    this->_client->setRequest(request);
+    this->_client->setRequest(this->_client->getRequest() + request);
 }
 
 void pipeline::postConnexion(){
