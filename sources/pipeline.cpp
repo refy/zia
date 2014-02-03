@@ -203,6 +203,10 @@ std::string pipeline::fileGetContent(const std::string &fileName)
         {
             this->_response->setStatusCode(404);
             this->_response->setReasonPhrase("Not Found");
+            this->_error->Code = 404;
+            this->_error->Message = "Not Found";
+            this->_error->IsError = true;
+            std::cout << "PD" << std::endl;
         }
         else
         {

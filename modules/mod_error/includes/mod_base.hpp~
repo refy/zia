@@ -1,0 +1,37 @@
+#ifndef		__PRECONNEXION_HPP__
+#define		__PRECONNEXION_HPP__
+
+#include	"AModule.hpp"
+#include	"ILogger.hpp"
+#include	"IConnexion.hpp"
+#include	"Error.hpp"
+
+class	mod_base : public apimeal::AModule
+{
+private:
+  apimeal::Version	_version;
+  std::string		_name;
+
+public:
+  mod_base(apimeal::ILogger *log);
+  ~mod_base();
+
+public:
+  virtual std::map<apimeal::eTypeModule, apimeal::ePriority>	getPriority() const;
+  virtual const apimeal::Version &				getVersion() const;
+  virtual const std::string &					getName() const;
+  virtual void preConnexion (apimeal::IConnexion *, apimeal::Error &);
+  virtual void postConnexion (apimeal::IConnexion *, apimeal::Error &);
+  virtual void preParseRequest(apimeal::IHttpRequest *, apimeal::Error &);
+  virtual void postParseRequest (apimeal::IHttpRequest *, apimeal::Error &);
+  virtual void contentModule (apimeal::IHttpRequest *, apimeal::Error &);
+  virtual void CGIModule (apimeal::IHttpResponse *, apimeal::Error &);
+  virtual void postGenerateResponse (apimeal::IHttpResponse *, apimeal::Error &);
+  virtual void preSendRequest (apimeal::IHttpResponse *, apimeal::IConnexion *, apimeal::Error &);
+  virtual void release ();
+
+protected:
+
+};
+
+#endif
