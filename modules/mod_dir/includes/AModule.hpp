@@ -92,7 +92,7 @@ public:
 	* \param IHttpRequest : Class for manage a query
 	* \param Error : Class for manage an error
 	*/
-	virtual void CGIModule(IHttpRequest *, Error &) { };
+	virtual void CGIModule(IHttpResponse *, Error &) { };
 	/**
 	* \brief After generation of the response
 	* \param IHttpResponse : Class with the query response

@@ -3,7 +3,10 @@
 #include	"mod_phpcgi.hpp"
 #include	"eTypeModule.hpp"
 #include	<sstream>
-#include <unistd.h>
+#include	<unistd.h>
+#include	 <string.h>
+#include	<signal.h>
+#include	<sys/wait.h>
 
 mod_phpcgi::mod_phpcgi(apimeal::ILogger *log)
 : AModule(log), _version(0, 1), _name("mod_phpcgi")

@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libmod_phpcgi.so -o libmod_phpcgi.so CMakeFiles/mod_phpcgi.dir/sources/mod_phpcgi.cpp.o 
