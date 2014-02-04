@@ -18,6 +18,8 @@ add_executable(launcher ${SDIR}launcher.cpp)
 if (UNIX)
   target_link_libraries(zia dl)
   target_link_libraries(zia pthread)
+  target_link_libraries(zia ssl)
+  target_link_libraries(zia crypto)
 endif()
 
 add_subdirectory(modules/CGIModule/)
