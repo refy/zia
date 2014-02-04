@@ -106,7 +106,6 @@ void mod_ssl::postConnexion (apimeal::IConnexion *con, apimeal::Error &e)
     int iResult;
     bool no_error = true;
     
-    std::cout << "PORT" << con->getPort() << std::endl;
     if (con->getPort() == 8484)
     {
         this->sslEnabled = true;

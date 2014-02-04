@@ -23,7 +23,6 @@ Server::Server(apimeal::ILogger *log, ConfParser *p)
         
         ite = ports.begin();
         while (ite != ports.end()) {
-            std::cout << *ite << std::endl;
             apimeal::IConnexion *tmp = new ConnexionAttente(*ite);
             if (tmp->getSocket() >= 0)
                 this->_coWait.push_back(tmp);
@@ -77,7 +76,6 @@ apimeal::IConnexion *Server::multiSelect()
     std::vector<apimeal::IConnexion *>::iterator ite = this->_coWait.begin();
     while (ite != this->_coWait.end())
     {
-        std::cout << (*ite)->getSocket() << std::endl;
         FD_SET((*ite)->getSocket(), &sock_sel);
         if ((*ite)->getSocket() > ndfs)
             ndfs = (*ite)->getSocket();
@@ -114,7 +112,6 @@ apimeal::IConnexion*	Server::accept_client()
     sin_size = sizeof(sin_tmp);
     signal(SIGPIPE, SIG_IGN);
     tmp = this->multiSelect();
-    std::cout << "TT" << tmp << std::endl;
     if (tmp)
     {
         if ((s_tmp = accept(tmp->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)

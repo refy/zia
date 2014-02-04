@@ -224,7 +224,6 @@ void                    ConfParser::fillPorts()
     
     if (this->_xml.find("/Zia/Server_info/port") != this->_xml.end())
         ports = this->_xml["/Zia/Server_info/port"];
-    std::cout << ports << std::endl;
     while (!ports.empty())
     {
         end = ports.find("-");
