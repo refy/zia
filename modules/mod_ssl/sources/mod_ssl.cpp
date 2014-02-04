@@ -118,12 +118,14 @@ void mod_ssl::postConnexion (apimeal::IConnexion *con, apimeal::Error &e)
         
         //FIXME we must get the certificates path from the configuration!
         // Load the certificate and the private key
-        if (SSL_CTX_use_certificate_file(ctx, "/Users/Jordan/ssl/server.crt", SSL_FILETYPE_PEM) < 1)
+        if (SSL_CTX_use_certificate_file(ctx, "/Users/Jordan/ssl/server.cr", SSL_FILETYPE_PEM) < 1)
         {
+            this->sslEnabled = false;
             return;
         }
-        if (SSL_CTX_use_PrivateKey_file(ctx, "/Users/Jordan/ssl/server.key.unsecure", SSL_FILETYPE_PEM) < 1)
+        if (SSL_CTX_use_PrivateKey_file(ctx, "/Users/Jordan/ssl/server.key.unsecur", SSL_FILETYPE_PEM) < 1)
         {
+            this->sslEnabled = false;
             return;
         }
         
@@ -131,12 +133,14 @@ void mod_ssl::postConnexion (apimeal::IConnexion *con, apimeal::Error &e)
         ssl = SSL_new(ctx);
         if (!ssl)
         {
+            this->sslEnabled = false;
             return;
         }
         
         
         if (SSL_set_fd(ssl, con->getSocket()) < 1)
         {
+            this->sslEnabled = false;
             return;
         }
         
@@ -158,6 +162,7 @@ void mod_ssl::postConnexion (apimeal::IConnexion *con, apimeal::Error &e)
                 case SSL_ERROR_SYSCALL:
                 case SSL_ERROR_SSL:
                 default:
+                    this->sslEnabled = false;
                     no_error = false;
                     break;
             }
