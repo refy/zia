@@ -20,7 +20,7 @@
 pipeline::pipeline(apimeal::IConnexion *client, ModuleLoader *moduleLoader):
 _client(client), __continue(true), _moduleLoader(moduleLoader)
 {
-//    this->_moduleLoader = new ModuleLoader(ConfParser::getInstance()->getModulesPath(), *this->_error, NULL);
+    //    this->_moduleLoader = new ModuleLoader(ConfParser::getInstance()->getModulesPath(), *this->_error, NULL);
 }
 
 void pipeline::preParseRequest()
@@ -206,7 +206,6 @@ std::string pipeline::fileGetContent(const std::string &fileName)
             this->_error->Code = 404;
             this->_error->Message = "Not Found";
             this->_error->IsError = true;
-            std::cout << "PD" << std::endl;
         }
         else
         {
@@ -243,7 +242,7 @@ void pipeline::getPostBody()
         body += buffer;
         pos += readed;
     } while (pos < bodySize && readed > 0);
-   
+    
     if (body.size())
         this->_client->setRequest(this->_client->getRequest() + body);
     body = this->_client->getRequest().substr(0,  atoi(this->_request->getHeaders().find("Content-Length")->second.c_str()));
@@ -402,7 +401,7 @@ bool pipeline::requestIsComplete(std::string &request)
 {
     while (request.find('\n') == 0 || request.find('\r') == 0)
     {
-        request = request.substr(0, 1);
+        request = request.substr(1);
     }
     if (request.find("\r\n\r\n") != request.npos || request.find("\n\n") != request.npos)
         return true;
@@ -415,15 +414,18 @@ void pipeline::readRequest()
     long readed = 0;
     char buffer[256];
     
-    do
+    if (this->_client->getRequest().size() == 0)
     {
-        readed = read(this->_client->getSocket(), buffer, 255);
-        if (readed > 0)
+        do
         {
-            buffer[readed] = 0;
-            request += buffer;
-        }
-    } while ((readed >= 255 || this->requestIsComplete(request) == false) && readed > 0);
+            readed = read(this->_client->getSocket(), buffer, 255);
+            if (readed > 0)
+            {
+                buffer[readed] = 0;
+                request += buffer;
+            }
+        } while ((readed >= 255 || this->requestIsComplete(request) == false) && readed > 0);
+    }
     if (request.size() == 0)
         this->__continue = false;
     this->_client->setRequest(this->_client->getRequest() + request);

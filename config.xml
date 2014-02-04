@@ -12,6 +12,7 @@
     <path>/Users/Jordan/Documents/Ziare/zia/modules/mod_dir/libmod_dir</path>
     <path>/Users/Jordan/Documents/Ziare/zia/modules/mod_phpcgi/libmod_phpcgi</path>
     <path>/Users/Jordan/Documents/Ziare/zia/modules/mod_error/libmod_error</path>
+    <path>/Users/Jordan/Documents/Ziare/zia/modules/mod_ssl/libmod_ssl</path>
     <ext>dylib</ext> <!-- the extension searched (ex :dll for windows). The program will try to load all the files with this extension content in the directory -->
   </Modules>
 

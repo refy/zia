@@ -5,6 +5,10 @@
 #include	"Logger.hpp"
 #include	"Server.hpp"
 
+#include <openssl/bio.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
 bool	check_error(apimeal::Error & e, apimeal::ILogger *log)
 {
     if (e.IsError)
@@ -39,6 +43,10 @@ int	main(int ac, char **av)
         else
             conf.assign(av[i]);
     }
+    
+    SSL_load_error_strings();
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
     
     ConfParser	*parser = ConfParser::getInstance();
     parser->setFile(conf);
