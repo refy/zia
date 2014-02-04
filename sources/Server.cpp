@@ -170,9 +170,9 @@ void	Server::listenServer()
         this->_log->LogError("Cannot create the waiting socket.");
     else
     {
-        //        this->printConnexionInfo(this->_coWait, "Server socket informations: ");
+        this->printConnexionInfo(this->_coWait, "Server socket informations: ");
         Thread		thread(this->pipelineEntry);
-        while (1)
+        while (this->_coWait.size() > 0)
         {
             ptr = this->accept_client();
             if (ptr)
