@@ -18,8 +18,7 @@ std::map<apimeal::eTypeModule, apimeal::ePriority>	mod_dir::getPriority() const
     std::map<apimeal::eTypeModule, apimeal::ePriority>	ret;
     
     ret[apimeal::POSTPARSEREQUEST] = 0.5f;
-    ret[apimeal::CGIMODULE] = 0.5f;
-    //    ret[apimeal::POSTGENERATERESPONSE] = 0.5f;
+    ret[apimeal::POSTGENERATERESPONSE] = 0.5f;
     return (ret);
 }
 

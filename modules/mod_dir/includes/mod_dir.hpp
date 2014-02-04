@@ -25,7 +25,7 @@ public:
   void preParseRequest(apimeal::IHttpRequest *, apimeal::Error &);
   void postParseRequest (apimeal::IHttpRequest *, apimeal::Error &);
   void contentModule (apimeal::IHttpRequest *, apimeal::Error &);
-  void CGIModule (apimeal::IHttpRequest *, apimeal::Error &);
+  void CGIModule (apimeal::IHttpResponse *, apimeal::Error &);
   void postGenerateResponse (apimeal::IHttpResponse *, apimeal::Error &);
   void preSendRequest (apimeal::IHttpResponse *, apimeal::IConnexion *, apimeal::Error &);
   void release ();
