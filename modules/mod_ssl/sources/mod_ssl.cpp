@@ -106,64 +106,71 @@ void mod_ssl::postConnexion (apimeal::IConnexion *con, apimeal::Error &e)
     int iResult;
     bool no_error = true;
     
-    // Initializing the SSL Method
-    ctx = SSL_CTX_new(SSLv23_server_method());
-    if (!ctx)
+    std::cout << "PORT" << con->getPort() << std::endl;
+    if (con->getPort() == 8484)
     {
-        return;
-    }
-    
-    //FIXME we must get the certificates path from the configuration!
-    // Load the certificate and the private key
-    if (SSL_CTX_use_certificate_file(ctx, "/Users/Jordan/ssl/server.crt", SSL_FILETYPE_PEM) < 1)
-    {
-        return;
-    }
-    if (SSL_CTX_use_PrivateKey_file(ctx, "/Users/Jordan/ssl/server.key.unsecure", SSL_FILETYPE_PEM) < 1)
-    {
-        return;
-    }
-    
-    // Creating SSL Structure
-    ssl = SSL_new(ctx);
-    if (!ssl)
-    {
-        return;
-    }
-    
-    
-    if (SSL_set_fd(ssl, con->getSocket()) < 1)
-    {
-        return;
-    }
-    
-    // Handshake (is blocking if underlying socket is blocking!!)
-    do
-    {
-        iResult = SSL_accept(ssl);
-        switch(SSL_get_error(ssl, iResult))
+        this->sslEnabled = true;
+        // Initializing the SSL Method
+        ctx = SSL_CTX_new(SSLv23_server_method());
+        if (!ctx)
         {
-            case SSL_ERROR_NONE:
-            case SSL_ERROR_ZERO_RETURN:
-            case SSL_ERROR_WANT_READ:
-                break;
-            case SSL_ERROR_WANT_WRITE:
-                break;
-            case SSL_ERROR_WANT_CONNECT:
-            case SSL_ERROR_WANT_ACCEPT:
-            case SSL_ERROR_WANT_X509_LOOKUP:
-            case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL:
-            default:
-                no_error = false;
-                break;
+            return;
         }
+        
+        //FIXME we must get the certificates path from the configuration!
+        // Load the certificate and the private key
+        if (SSL_CTX_use_certificate_file(ctx, "/Users/Jordan/ssl/server.crt", SSL_FILETYPE_PEM) < 1)
+        {
+            return;
+        }
+        if (SSL_CTX_use_PrivateKey_file(ctx, "/Users/Jordan/ssl/server.key.unsecure", SSL_FILETYPE_PEM) < 1)
+        {
+            return;
+        }
+        
+        // Creating SSL Structure
+        ssl = SSL_new(ctx);
+        if (!ssl)
+        {
+            return;
+        }
+        
+        
+        if (SSL_set_fd(ssl, con->getSocket()) < 1)
+        {
+            return;
+        }
+        
+        // Handshake (is blocking if underlying socket is blocking!!)
+        do
+        {
+            iResult = SSL_accept(ssl);
+            switch(SSL_get_error(ssl, iResult))
+            {
+                case SSL_ERROR_NONE:
+                case SSL_ERROR_ZERO_RETURN:
+                case SSL_ERROR_WANT_READ:
+                    break;
+                case SSL_ERROR_WANT_WRITE:
+                    break;
+                case SSL_ERROR_WANT_CONNECT:
+                case SSL_ERROR_WANT_ACCEPT:
+                case SSL_ERROR_WANT_X509_LOOKUP:
+                case SSL_ERROR_SYSCALL:
+                case SSL_ERROR_SSL:
+                default:
+                    no_error = false;
+                    break;
+            }
+        }
+        while (iResult < 0 && no_error);
+        std::string content;
+        this->recv(content);
+        con->setRequest(content);
+        con->setSocket(-1);
     }
-    while (iResult < 0 && no_error);
-    std::string content;
-    this->recv(content);
-    con->setRequest(content);
-    con->setSocket(-1);
+    else
+        this->sslEnabled = false;
 }
 
 void mod_ssl::preParseRequest(apimeal::IHttpRequest *, apimeal::Error &){}
@@ -182,22 +189,24 @@ void mod_ssl::postGenerateResponse (apimeal::IHttpResponse *resp, apimeal::Error
 
 void mod_ssl::preSendRequest (apimeal::IHttpResponse *resp, apimeal::Error &e)
 {
-    std::map<std::string, std::string>::const_iterator ite;
-    
-    ite = resp->getHeaders().begin();
-    std::ostringstream oss;
-    oss << "HTTP/1.1 " << resp->getStatusCode() << " " << resp->getReasonPhrase() << "\n";
-    this->send(oss.str());
-    while (ite != resp->getHeaders().end())
+    if (this->sslEnabled)
     {
-        oss.clear();
-        oss << ite->first << ": " << ite->second << "\n";
+        std::map<std::string, std::string>::const_iterator ite;
+        ite = resp->getHeaders().begin();
+        std::ostringstream oss;
+        oss << "HTTP/1.1 " << resp->getStatusCode() << " " << resp->getReasonPhrase() << "\n";
         this->send(oss.str());
-        ++ite;
+        while (ite != resp->getHeaders().end())
+        {
+            oss.clear();
+            oss << ite->first << ": " << ite->second << "\n";
+            this->send(oss.str());
+            ++ite;
+        }
+        this->send("\n");
+        this->send(resp->getBody());
+        this->send("\n");
     }
-    this->send("\n");
-    this->send(resp->getBody());
-    this->send("\n");
 }
 
 void mod_ssl::release (){}

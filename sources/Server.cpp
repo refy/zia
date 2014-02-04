@@ -18,7 +18,17 @@ Server::Server(apimeal::ILogger *log, ConfParser *p)
     if (p)
     {
         this->_loader.LoadModules(p->getModulesPath(), this->_err, this->_log);
-        this->_coWait = new ConnexionAttente(p->getPort());
+        std::vector<int> ports = p->getPorts();
+        std::vector<int>::iterator ite;
+        
+        ite = ports.begin();
+        while (ite != ports.end()) {
+            std::cout << *ite << std::endl;
+            apimeal::IConnexion *tmp = new ConnexionAttente(*ite);
+            if (tmp->getSocket() >= 0)
+                this->_coWait.push_back(tmp);
+            ++ite;
+        }
     }
 }
 
@@ -31,7 +41,14 @@ void	Server::initServer(apimeal::ILogger *log, ConfParser *p)
     if (p)
     {
         this->_loader.LoadModules(p->getModulesPath(), this->_err, this->_log);
-        this->_coWait = new ConnexionAttente(p->getPort());
+        std::vector<int> ports = p->getPorts();
+        std::vector<int>::iterator ite;
+        
+        ite = ports.begin();
+        while (ite != ports.end()) {
+            this->_coWait.push_back(new ConnexionAttente(*ite));
+            ++ite;
+        }
     }
 }
 
@@ -47,6 +64,42 @@ bool	Server::checkError()
     return false;
 }
 
+#include <sys/select.h>
+
+apimeal::IConnexion *Server::multiSelect()
+{
+    apimeal::IConnexion *ret = NULL;
+    int ndfs = 0;
+    fd_set sock_sel;
+    int sel_ret;
+    FD_ZERO(&sock_sel);
+    
+    std::vector<apimeal::IConnexion *>::iterator ite = this->_coWait.begin();
+    while (ite != this->_coWait.end())
+    {
+        std::cout << (*ite)->getSocket() << std::endl;
+        FD_SET((*ite)->getSocket(), &sock_sel);
+        if ((*ite)->getSocket() > ndfs)
+            ndfs = (*ite)->getSocket();
+        ite++;
+    }
+    ndfs++;
+    sel_ret = select(ndfs, &sock_sel, NULL, NULL, NULL);
+    if (sel_ret > 0)
+    {
+        ite = this->_coWait.begin();
+        while (ite != this->_coWait.end() && ret == NULL)
+        {
+            if (FD_ISSET((*ite)->getSocket(), &sock_sel))
+            {
+                ret = (*ite);
+            }
+            ite++;
+        }
+    }
+    return ret;
+}
+
 #include <iostream>
 
 apimeal::IConnexion*	Server::accept_client()
@@ -54,19 +107,26 @@ apimeal::IConnexion*	Server::accept_client()
     sockaddr_in	sin_tmp;
     SOCKET	s_tmp;
     socklen_t	sin_size;
+    apimeal::IConnexion *tmp;
     
-    if (!this->_coWait->getSocket() < 0)
+    if (this->_coWait.size() <= 0)
         return (0);
     sin_size = sizeof(sin_tmp);
     signal(SIGPIPE, SIG_IGN);
-    if ((s_tmp = accept(this->_coWait->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)
+    tmp = this->multiSelect();
+    std::cout << "TT" << tmp << std::endl;
+    if (tmp)
     {
-        return (0);
+        if ((s_tmp = accept(tmp->getSocket(), (sockaddr *)&sin_tmp, &sin_size)) < 0)
+        {
+            return (0);
+        }
+        apimeal::IConnexion *ptr = new ConnexionClient(sin_tmp, s_tmp, tmp);
+        if (ptr == 0)
+            return (0);
+        return (ptr);
     }
-    apimeal::IConnexion *ptr = new ConnexionClient(sin_tmp, s_tmp);
-    if (ptr == 0)
-        return (0);
-    return (ptr);
+    return 0;
 }
 
 void *Server::pipelineEntry(void *param)
@@ -77,8 +137,8 @@ void *Server::pipelineEntry(void *param)
     // postConnexion;
     pipeline pipe(client, moduleLoader);
     pipe.run();
-//    delete client;
-//    delete moduleLoader;
+    //    delete client;
+    //    delete moduleLoader;
     return NULL;
 }
 
@@ -106,17 +166,21 @@ void	Server::listenServer()
 {
     apimeal::IConnexion	*ptr;
     
-    if (this->_coWait->getSocket() < 0)
+    if (this->_coWait.size() <= 0)
         this->_log->LogError("Cannot create the waiting socket.");
     else
     {
-        this->printConnexionInfo(this->_coWait, "Server socket informations: ");
+        //        this->printConnexionInfo(this->_coWait, "Server socket informations: ");
         Thread		thread(this->pipelineEntry);
-        while ((ptr = this->accept_client()) != 0)
+        while (1)
         {
-            this->printConnexionInfo(ptr, "Client socket informations: ");
-            this->checkError();
-            thread.run(ptr);
+            ptr = this->accept_client();
+            if (ptr)
+            {
+                this->printConnexionInfo(ptr, "Client socket informations: ");
+                this->checkError();
+                thread.run(ptr);
+            }
         }
     }
 }

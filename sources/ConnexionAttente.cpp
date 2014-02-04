@@ -5,7 +5,7 @@ ConnexionAttente::ConnexionAttente(int port, int nbs_attente)
 	this->_sin.sin_addr.s_addr  = htonl(INADDR_ANY);
 	this->_sin.sin_family       = AF_INET;
 	this->_sin.sin_port         = htons(port);
-
+    
 	if ((this->_sock = socket(AF_INET, SOCK_STREAM, 0)) >= 0)
 	{
 		int yes = 1;
@@ -19,7 +19,7 @@ ConnexionAttente::ConnexionAttente(int port, int nbs_attente)
 			close(this->_sock);
 			this->_sock = -1;
 		}
-    		else if (listen(this->_sock, nbs_attente) < 0)
+        else if (listen(this->_sock, nbs_attente) < 0)
 		{
 			close(this->_sock);
 			this->_sock = -1;

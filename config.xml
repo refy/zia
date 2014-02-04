@@ -44,7 +44,8 @@
         <document_root>/var/www/supinfo/</document_root>
     </website>
 
-    <port>8883</port>
+    <port>8484</port>
+    <port>4242</port>
   </Server_info>
 
 </Zia>

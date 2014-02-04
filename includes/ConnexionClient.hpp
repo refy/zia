@@ -15,7 +15,7 @@
 class ConnexionClient: public apimeal::IConnexion
 {
     public:
-	ConnexionClient(const sockaddr_in &sin, SOCKET s);
+	ConnexionClient(const sockaddr_in &sin, SOCKET s, apimeal::IConnexion *p);
 	~ConnexionClient();
 	
 	/**

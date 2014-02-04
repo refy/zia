@@ -1,7 +1,7 @@
 #include	"ConnexionClient.hpp"
 
 
-ConnexionClient::ConnexionClient(const sockaddr_in &sin, SOCKET s)
+ConnexionClient::ConnexionClient(const sockaddr_in &sin, SOCKET s, apimeal::IConnexion *p)
 {
 	this->_sock = s;
 
@@ -9,7 +9,8 @@ ConnexionClient::ConnexionClient(const sockaddr_in &sin, SOCKET s)
 	this->_ip = std::string(inet_ntoa(sin.sin_addr));
 			
 	// Port du client
-	this->_port = sin.sin_port;
+	this->_port = p->getPort();
+//    sin.sin_port;
 			
 	// Hostname du serveur
 	struct hostent *hp;

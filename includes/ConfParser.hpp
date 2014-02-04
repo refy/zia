@@ -17,6 +17,7 @@ class	ConfParser
     std::vector<std::string>		_modules;
     std::map<std::string, std::string>	_docs;
     std::vector<std::string>		_hosts;
+    std::vector<int>        _ports;
     
     void			getContent();
     bool			cleanLine(std::string & line, bool comment);
@@ -24,6 +25,7 @@ class	ConfParser
     void			fillContent();
     void			fillModules();
     void			fillWebsite();
+    void            fillPorts();
     static          ConfParser *_singleton;
     
 public:
@@ -34,7 +36,8 @@ public:
     void setFile(const std::string &fileName);
     void					initialize(apimeal::Error & error);
     const std::string &			getApiName();
-    int					getPort();
+    std::vector<int> getPorts();
+//    int					getPort();
     const std::string &			getApiVersionMin();
     const std::vector<std::string> &	getModulesPath() const;
     const std::string &			getLoggerFile();

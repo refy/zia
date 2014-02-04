@@ -43,6 +43,7 @@ protected:
     bool                        _closed;
     std::string                 _address;
     int                         _port;
+    bool                        sslEnabled;
 };
 
 #endif

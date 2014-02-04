@@ -13,7 +13,8 @@ private:
   apimeal::ILogger*	_log;
   apimeal::Error	_err;
   ModuleLoader		_loader;
-    apimeal::IConnexion *_coWait;
+    std::vector<apimeal::IConnexion *> _coWait;
+//    apimeal::IConnexion *_coWait;
     ConfParser *_conf;
     
 public:
@@ -27,9 +28,11 @@ private:
   static void*		pipelineEntry(void *);
   void			printConnexionInfo(apimeal::IConnexion *ptr, const std::string & msg);
     
+    apimeal::IConnexion *multiSelect();
+    
 public:
   void initServer(apimeal::ILogger *log, ConfParser *p);
-  void listenServer();
+    void listenServer();
   void closeServer() {}
 
 };

@@ -6,14 +6,14 @@
 ConfParser *ConfParser::_singleton;
 
 ConfParser::ConfParser():
-    _file("")
+_file("")
 {
-  this->_search["/Zia/Api/name"] = "apimeal";
-  this->_search["/Zia/Api/min_authorized_version"] = "0.1";
-  this->_search["/Zia/Logger_info/log_file"] = "apimeal-zia.log";
-  this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
-  this->_search["/Zia/Server_info/port"] = "80";
-  this->_docs["NO VIRTUAL HOST"] = "";
+    this->_search["/Zia/Api/name"] = "apimeal";
+    this->_search["/Zia/Api/min_authorized_version"] = "0.1";
+    this->_search["/Zia/Logger_info/log_file"] = "apimeal-zia.log";
+    this->_search["/Zia/Logger_info/format"] = "%(type) : %(message)";
+    this->_search["/Zia/Server_info/port"] = "80";
+    this->_docs["NO VIRTUAL HOST"] = "";
 }
 
 ConfParser::~ConfParser()
@@ -136,15 +136,16 @@ void					ConfParser::getContent()
             }
         }
     }
-//    else
-//    {
-//        error.IsError = true;
-//        error.Message = "An error occured during the parsing of the xml file.";
-//    }
+    //    else
+    //    {
+    //        error.IsError = true;
+    //        error.Message = "An error occured during the parsing of the xml file.";
+    //    }
     file.close();
     this->fillModules();
     this->fillWebsite();
     this->fillContent();
+    this->fillPorts();
     this->_xml.clear();
 }
 
@@ -173,19 +174,19 @@ void					ConfParser::fillWebsite()
         docs = this->_xml["/Zia/Server_info/website/document_root"];
     while (!host.empty() && !docs.empty())
     {
-      end = host.find("-");
-      if (end == std::string::npos)
-	end = host.size();
-      tmp_h = host.substr(0, end);
-      host.erase(0, (end + 1));
-
-      end = docs.find("-");
-      if (end == std::string::npos)
-	end = docs.size();
-      tmp_d = docs.substr(0, end);
-      docs.erase(0, (end + 1));
-      this->_hosts.push_back(tmp_h);
-      this->_docs[tmp_h] = tmp_d;
+        end = host.find("-");
+        if (end == std::string::npos)
+            end = host.size();
+        tmp_h = host.substr(0, end);
+        host.erase(0, (end + 1));
+        
+        end = docs.find("-");
+        if (end == std::string::npos)
+            end = docs.size();
+        tmp_d = docs.substr(0, end);
+        docs.erase(0, (end + 1));
+        this->_hosts.push_back(tmp_h);
+        this->_docs[tmp_h] = tmp_d;
     }
 }
 
@@ -214,20 +215,48 @@ void					ConfParser::fillModules()
     }
 }
 
+void                    ConfParser::fillPorts()
+{
+    std::string	ports;
+    std::string	tmp_p;
+    size_t	end;
+    int			tmp;
+    
+    if (this->_xml.find("/Zia/Server_info/port") != this->_xml.end())
+        ports = this->_xml["/Zia/Server_info/port"];
+    std::cout << ports << std::endl;
+    while (!ports.empty())
+    {
+        end = ports.find("-");
+        if (end == std::string::npos)
+            end = ports.size();
+        tmp_p = ports.substr(0, end);
+        ports.erase(0, (end + 1));
+        std::istringstream	buffer(tmp_p);
+        buffer >> tmp;
+        this->_ports.push_back(tmp);
+    }
+}
+
 const std::string &			ConfParser::getApiName()
 {
     return (this->_search["/Zia/Api/name"]);
 }
 
-int					ConfParser::getPort()
+std::vector<int>  ConfParser::getPorts()
 {
-    int			ret;
-    std::string		m = this->_search["/Zia/Server_info/port"];
-    std::istringstream	buffer(m);
-    
-    buffer >> ret;
-    return (ret);
+    return this->_ports;
 }
+
+//int					ConfParser::getPort()
+//{
+//    int			ret;
+//    std::string		m = this->_search["/Zia/Server_info/port"];
+//    std::istringstream	buffer(m);
+//    
+//    buffer >> ret;
+//    return (ret);
+//}
 
 const std::string &			ConfParser::getApiVersionMin()
 {
