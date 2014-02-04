@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libmod_error.so -o libmod_error.so CMakeFiles/mod_error.dir/sources/mod_error.cpp.o 

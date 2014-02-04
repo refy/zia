@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libmod_dir.so -o libmod_dir.so CMakeFiles/mod_dir.dir/sources/mod_dir.cpp.o 
