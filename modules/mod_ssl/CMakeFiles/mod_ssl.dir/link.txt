@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libmod_ssl.so -o libmod_ssl.so CMakeFiles/mod_ssl.dir/sources/mod_ssl.cpp.o -lssl -lcrypto 
